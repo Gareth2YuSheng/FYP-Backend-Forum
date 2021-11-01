@@ -69,5 +69,5 @@ process.on("uncaughtException", function(error, origin) {
 
 app.listen(PORT, err => {
     if (err) return logger.error(`Cannot Listen on PORT: ${PORT}`);
-    logger.info(`Server is Listening on: https://localhost:${PORT}/`);
+    logger.info(`Server is Listening on: http://localhost:${PORT}/`);
 });
