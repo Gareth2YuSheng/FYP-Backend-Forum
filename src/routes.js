@@ -12,6 +12,8 @@ exports.appRoute = router => {
 
     router.put("/api/test", testController.testRouteFuncPut);
 
+    router.delete("/api/test", testController.testRouteFuncDelete);
+
     //sanitization function
     router.use(validateFn.sanitizeResult); 
 };
