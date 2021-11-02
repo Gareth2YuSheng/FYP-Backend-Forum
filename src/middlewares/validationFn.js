@@ -1,3 +1,4 @@
+//For input validation and output sanitization functions
 const validator = require("validator");
 const { logger } = require("../logger/logger");
 const { ApplicationError } = require("../errors/errors");
