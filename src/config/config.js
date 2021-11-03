@@ -7,5 +7,11 @@ module.exports = {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     
-    JWTKey: process.env.JWTKEY
+    JWTKey: process.env.JWTKEY,
+
+    databaseUser: process.env.DB_USER,
+    databasePassword: process.env.DB_PASSWORD,
+    databaseName: process.env.DB_NAME,
+    databaseUrl: process.env.DB_URL,
+    
 };
