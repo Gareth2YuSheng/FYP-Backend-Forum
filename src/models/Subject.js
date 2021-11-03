@@ -1,8 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const Role = sequelize.define("Role", {
-        roleId: {
+const Subject = sequelize.define("Subject", {
+        subjectId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
@@ -12,7 +12,7 @@ const Role = sequelize.define("Role", {
                 isInt: true
             }
         },
-        roleName: {
+        subjectName: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -21,8 +21,8 @@ const Role = sequelize.define("Role", {
             }
         }
     },{
-        tableName:"role"
+        tableName:"subject"
     }
 );
 
-module.exports = Role;
+module.exports = Subject;

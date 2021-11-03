@@ -1,73 +1,63 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const Post = sequelize.define('Post', {
-    postId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        unique: true,
-        primaryKey: true,
-        validate: {
-            notNull: true,
-            isInt: true
-        }
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        unique: true,
-        validate: {
-            notNull: true,
-            isInt: true
+const Post = sequelize.define("Post", {
+        postId: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            allowNull: false,
+            unique: true,
+            primaryKey: true,
+            validate: {
+                notNull: true
+            }
         },
-        references: {
-            model: User,
-            key: "userId"
+        // userId: {
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false,
+        //     validate: {
+        //         notNull: true,
+        //         isInt: true
+        //     }
+        // },
+        topicId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
+        },
+        title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
+        },
+        content: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
+        },
+        createdTime: {
+            type: DataTypes.TIME,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
+        },
+        status: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
         }
-    },
-    topicId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-            isInt: true
-        }
-    },
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
-    },
-    content: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
-    },
-    createdTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
-    },
-    // edited: {
-
-    // },
-    status: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
+    }, {
+        tableName: "post"
     }
-}, {
-    tableName: "post"
-}
 );
 
 module.exports = Post;

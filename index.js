@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const { logger, requestLogger } = require("./src/logger/logger");
 const { ApplicationError } = require("./src/errors/errors");
 
+
 const app = express();
 
 //CORS

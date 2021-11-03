@@ -2,7 +2,7 @@ const { createLogger, format, transports, exitOnError } = require("winston");
 const { combine, timestamp, printf } = format;
 
 const myFormat = printf( ({ level, message, timestamp , ...metadata}) => {
-  let msg = `${timestamp} [${level}] : ${message.trim()} `;
+  let msg = `${timestamp} [${level}] : ${message} `;
   if(metadata) { msg += JSON.stringify(metadata); }
   return msg;
 });

@@ -1,69 +1,48 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const User = sequelize.define("User", {
-        userId: {
+const File = sequelize.define("File", {
+        fileId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            autoIncrement: true,
-            unique: true,
             primaryKey: true,
+            autoIncrement: true,
             validate: {
                 notNull: true,
                 isInt: true
             }
         },
-        // roleId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     validate: {
-        //         notNull: true,
-        //         isInt: true
-        //     }
+        cloudinaryFileId: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                notEmpty: true
+            }
+        },
+        cloudinaryUrl: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                notEmpty: true
+            }
+        },
+        fileName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                notEmpty: true
+            }
+        },
+        // parentId: {
+        //     type: DataTypes.INT,
+        //     allowNull: false
         // },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true,
-                notNull: true,
-                notEmpty: true
-            }
-        },
-        userName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            // unique: true
-            validate: {
-                notNull: true,
-                notEmpty: true
-            }
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            // unique: true
-            validate: {
-                notNull: true,
-                notEmpty: true
-            }
-        },
-        profileImage: {
-            type: DataTypes.STRING(300),
-            validate: {
-                isUrl: true
-            }
-        },
-        rating: {
-            type: DataTypes.DECIMAL(10, 2),
-            validate: {
-                isDecimal:true
-            }
-        }
     },{
-        tableName:"user"
+        tableName:"file"
     }
 );
 
-module.exports = User;
+module.exports = File;

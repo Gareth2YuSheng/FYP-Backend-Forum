@@ -9,6 +9,22 @@ class ApplicationError extends Error {
   }
 }
 
+class DatabaseError extends Error {
+  constructor(message) {
+    super(message);
+    Error.captureStackTrace(this);
+  }
+}
+
+class DatabaseConnectionError extends DatabaseError {
+  constructor(message) {
+    super(message);
+    Error.captureStackTrace(this);
+  }
+}
+
 module.exports = {
     ApplicationError,
+    DatabaseError,
+    DatabaseConnectionError
 };
