@@ -16,8 +16,7 @@ const File = require("../models/File");
 
 //Define Associations
 //post Table
-User.hasMany(Post);
-Post.belongsTo(User, {
+User.hasMany(Post, {
     foreignKey: {
         name: "userId",
         type: DataTypes.UUID,
@@ -28,10 +27,20 @@ Post.belongsTo(User, {
     },
     onDelete: "CASCADE"
 });
+// Post.belongsTo(User, {
+//     foreignKey: {
+//         name: "userId",
+//         type: DataTypes.UUID,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     },
+//     onDelete: "CASCADE"
+// });
 
 //postReply Table
-Post.hasMany(PostReply);
-PostReply.belongsTo(Post, {
+Post.hasMany(PostReply, {
     foreignKey: {
         name: "postId",
         type: DataTypes.UUID,
@@ -42,8 +51,18 @@ PostReply.belongsTo(Post, {
     },
     onDelete: "CASCADE"
 });
-User.hasMany(PostReply);
-PostReply.belongsTo(User, {
+// PostReply.belongsTo(Post, {
+//     foreignKey: {
+//         name: "postId",
+//         type: DataTypes.UUID,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     },
+//     onDelete: "CASCADE"
+// });
+User.hasMany(PostReply, {
     foreignKey: {
         name: "userId",
         type: DataTypes.UUID,
@@ -54,10 +73,20 @@ PostReply.belongsTo(User, {
     },
     onDelete: "CASCADE"
 });
+// PostReply.belongsTo(User, {
+//     foreignKey: {
+//         name: "userId",
+//         type: DataTypes.UUID,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     },
+//     onDelete: "CASCADE"
+// });
 
 //user Table
-Role.hasMany(User);
-User.belongsTo(Role, {
+Role.hasMany(User, {
     foreignKey: {
         name: "roleId",
         type: DataTypes.INTEGER,
@@ -68,10 +97,20 @@ User.belongsTo(Role, {
         }
     }
 });
+// User.belongsTo(Role, {
+//     foreignKey: {
+//         name: "roleId",
+//         type: DataTypes.INTEGER,
+//         allowNull: false,
+//         validate: {
+//             notNull: true,
+//             isInt: true
+//         }
+//     }
+// });
 
 //vote Table
-User.hasMany(Vote);
-Vote.belongsTo(User, {
+User.hasMany(Vote, {
     foreignKey: {
         name: "userId",
         type: DataTypes.UUID,
@@ -82,8 +121,18 @@ Vote.belongsTo(User, {
     },
     onDelete: "CASCADE"
 });
-PostReply.hasMany(Vote);
-Vote.belongsTo(PostReply, {
+// Vote.belongsTo(User, {
+//     foreignKey: {
+//         name: "userId",
+//         type: DataTypes.UUID,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     },
+//     onDelete: "CASCADE"
+// });
+PostReply.hasMany(Vote, {
     foreignKey: {
         name: "parentId",
         type: DataTypes.UUID,
@@ -94,10 +143,20 @@ Vote.belongsTo(PostReply, {
     },
     onDelete: "CASCADE"
 });
+// Vote.belongsTo(PostReply, {
+//     foreignKey: {
+//         name: "parentId",
+//         type: DataTypes.UUID,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     },
+//     onDelete: "CASCADE"
+// });
 
 //subject Table
-Subject.hasMany(Post);
-Post.belongsTo(Subject, {
+Subject.hasMany(Post, {
     foreignKey: {
         name: "subjectId",
         type: DataTypes.INTEGER,
@@ -107,10 +166,19 @@ Post.belongsTo(Subject, {
         }
     }
 });
+// Post.belongsTo(Subject, {
+//     foreignKey: {
+//         name: "subjectId",
+//         type: DataTypes.INTEGER,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     }
+// });
 
 //fileTable
-Post.hasMany(File);
-File.belongsTo(Post, {
+Post.hasMany(File, {
     foreignKey: {
         name: "parentId",
         type: DataTypes.UUID,
@@ -120,6 +188,16 @@ File.belongsTo(Post, {
         }
     }
 });
+// File.belongsTo(Post, {
+//     foreignKey: {
+//         name: "parentId",
+//         type: DataTypes.UUID,
+//         allowNull: false,
+//         validate: {
+//             notNull: true
+//         }
+//     }
+// });
 
 
 async function resetTables() {
@@ -130,7 +208,7 @@ async function resetTables() {
         .then(result => {
             logger.info("Reset DB Tables successfully")
             // logger.info(result); //unable to stringify
-            console.log(result);
+            //console.log(result);
         }).catch(error => {
             logger.error("", new DatabaseError(error.message));
         });
@@ -166,7 +244,16 @@ async function resetTables() {
         userName: "Bob The Builder",
         password: "password",
         roleId: 1
-    });
+    }).then(result => {
+        console.log(result.userId)
+        Post.create({
+            title: "HI",
+            content: "HI",
+            status: "OPEN",
+            subjectId: 1,
+            userId: result.userId
+        })
+    })
 }
 
 resetTables();
