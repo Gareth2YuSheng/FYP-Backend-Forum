@@ -20,7 +20,7 @@ User.hasMany(Post);
 Post.belongsTo(User, {
     foreignKey: {
         name: "userId",
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         validate: {
             notNull: true,
@@ -47,7 +47,7 @@ User.hasMany(PostReply);
 PostReply.belongsTo(User, {
     foreignKey: {
         name: "userId",
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         validate: {
             notNull: true,
@@ -76,7 +76,7 @@ User.hasMany(Vote);
 Vote.belongsTo(User, {
     foreignKey: {
         name: "userId",
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         validate: {
             notNull: true,

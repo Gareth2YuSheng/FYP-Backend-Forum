@@ -14,7 +14,7 @@ exports.getForumQuestionDetails = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -37,7 +37,7 @@ exports.createForumQuestion = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -61,7 +61,7 @@ exports.editForumQuestionDetails = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -85,7 +85,7 @@ exports.deleteForumQuestion = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,

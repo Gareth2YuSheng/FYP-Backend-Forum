@@ -15,7 +15,7 @@ exports.getForumQuestionReplies = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -38,7 +38,7 @@ exports.createForumReply = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -61,7 +61,7 @@ exports.upvoteForumReply = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -84,7 +84,7 @@ exports.downvoteForumReply = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -107,7 +107,7 @@ exports.editForumReply = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -130,7 +130,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = 'Server is unable to process the request.';
+        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
