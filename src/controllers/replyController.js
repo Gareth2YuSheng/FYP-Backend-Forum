@@ -14,7 +14,8 @@ exports.getForumQuestionReplies = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
-        next(new ApplicationError(error.message));
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error)
         let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
@@ -37,7 +38,8 @@ exports.createForumReply = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
-        next(new ApplicationError(error.message));
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error)
         let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
@@ -60,7 +62,8 @@ exports.upvoteForumReply = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
-        next(new ApplicationError(error.message));
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error)
         let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
@@ -83,7 +86,8 @@ exports.downvoteForumReply = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
-        next(new ApplicationError(error.message));
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error)
         let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
@@ -106,7 +110,8 @@ exports.editForumReply = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
-        next(new ApplicationError(error.message));
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error)
         let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
@@ -129,7 +134,8 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
-        next(new ApplicationError(error.message));
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error)
         let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  

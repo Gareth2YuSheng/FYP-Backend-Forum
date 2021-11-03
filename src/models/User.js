@@ -9,14 +9,6 @@ const User = sequelize.define("User", {
             unique: true,
             primaryKey: true
         },
-        // roleId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     validate: {
-        //         notNull: true,
-        //         isInt: true
-        //     }
-        // },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -39,7 +31,6 @@ const User = sequelize.define("User", {
         password: {
             type: DataTypes.STRING,
             allowNull: false,
-            // unique: true
             validate: {
                 notNull: true,
                 notEmpty: true

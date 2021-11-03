@@ -8,7 +8,6 @@ const Subject = sequelize.define("Subject", {
             primaryKey: true,
             autoIncrement: true,
             validate: {
-                notNull: true,
                 isInt: true
             }
         },
@@ -21,7 +20,8 @@ const Subject = sequelize.define("Subject", {
             }
         }
     },{
-        tableName:"subject"
+        tableName:"subject",
+        timestamps: false
     }
 );
 

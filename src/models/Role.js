@@ -8,7 +8,6 @@ const Role = sequelize.define("Role", {
             primaryKey: true,
             autoIncrement: true,
             validate: {
-                notNull: true,
                 isInt: true
             }
         },
@@ -21,7 +20,8 @@ const Role = sequelize.define("Role", {
             }
         }
     },{
-        tableName:"role"
+        tableName:"role",
+        timestamps: false
     }
 );
 

@@ -8,7 +8,6 @@ const File = sequelize.define("File", {
             primaryKey: true,
             autoIncrement: true,
             validate: {
-                notNull: true,
                 isInt: true
             }
         },
@@ -35,11 +34,7 @@ const File = sequelize.define("File", {
                 notNull: true,
                 notEmpty: true
             }
-        },
-        // parentId: {
-        //     type: DataTypes.INT,
-        //     allowNull: false
-        // },
+        }
     },{
         tableName:"file"
     }

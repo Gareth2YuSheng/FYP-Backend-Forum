@@ -9,7 +9,7 @@ class ApplicationError extends Error {
   }
 }
 
-class DatabaseError extends Error {
+class DatabaseError extends ApplicationError {
   constructor(message) {
     super(message);
     Error.captureStackTrace(this);

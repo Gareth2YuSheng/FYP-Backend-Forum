@@ -16,6 +16,7 @@ const verifyFn = {
       res.send(`{"Message":"Not Authorized"}`);
     } else {
         //Do not validate token first, not our token
+        next();
     //   token = token.split('Bearer ')[1]; 
     //   jwt.verify(token,config.JWTKey,function(err,decoded){
     //     if(err){

@@ -7,39 +7,13 @@ const PostReply = sequelize.define("PostReply", {
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             unique: true,
-            primaryKey: true,
-            validate: {
-                notNull: true
-            }
+            primaryKey: true
         },
-        // userId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     validate: {
-        //         notNull: true,
-        //         isInt: true
-        //     }
-        // },
-        // postId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     validate: {
-        //         notNull: true,
-        //         isInt: true
-        //     }
-        // },
         content: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true
-            }
-        },
-        createdTime: {
-            type: DataTypes.TIME,
-            allowNull: false,
-            validate: {
-                notNull: true
             }
         },
         isAnswer: {

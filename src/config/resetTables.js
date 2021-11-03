@@ -23,8 +23,7 @@ Post.belongsTo(User, {
         type: DataTypes.UUID,
         allowNull: false,
         validate: {
-            notNull: true,
-            isInt: true
+            notNull: true
         }
     },
     onDelete: "CASCADE"
@@ -50,8 +49,7 @@ PostReply.belongsTo(User, {
         type: DataTypes.UUID,
         allowNull: false,
         validate: {
-            notNull: true,
-            isInt: true
+            notNull: true
         }
     },
     onDelete: "CASCADE"
@@ -79,8 +77,7 @@ Vote.belongsTo(User, {
         type: DataTypes.UUID,
         allowNull: false,
         validate: {
-            notNull: true,
-            isInt: true
+            notNull: true
         }
     },
     onDelete: "CASCADE"
@@ -106,8 +103,7 @@ Post.belongsTo(Subject, {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            notNull: true,
-            isInt: true
+            notNull: true
         }
     }
 });
@@ -164,6 +160,13 @@ async function resetTables() {
     Subject.create({
         subjectName: "Mathematics"
     }); 
+    //Test User, remove later
+    User.create({
+        email: "user1@users.com",
+        userName: "Bob The Builder",
+        password: "password",
+        roleId: 1
+    });
 }
 
 resetTables();

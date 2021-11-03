@@ -1,5 +1,6 @@
 //Import Controllers
 const testController = require("./controllers/testController"); //remove later
+const authController = require("./controllers/authController");
 const questionController = require("./controllers/questionController");
 const replyController = require("./controllers/replyController");
 const validateFn = require("./middlewares/validationFn");
@@ -15,9 +16,12 @@ exports.appRoute = router => {
 
     //GET
     router.get("/question/:q_id/details", verifyFn.verifyToken, questionController.getForumQuestionDetails);
-    router.get("/reply/:q_id", verifyFn.verifyToken, replyController.getForumQuestionReplies);
+    router.get("/reply/:q_id?", verifyFn.verifyToken, replyController.getForumQuestionReplies);
+    router.get("/question/all", verifyFn.verifyToken, questionController.getForumQuestions);
 
     //POST
+    router.post("/login", authController.login);
+    router.post("/register", authController.register);
     router.post("/question/create", verifyFn.verifyToken, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, replyController.createForumReply);
     
