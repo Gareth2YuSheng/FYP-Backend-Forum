@@ -13,12 +13,11 @@ exports.register = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of register
@@ -35,12 +34,11 @@ exports.login = async (req, res, next) => {
         });
     } catch (error) {
         next(new ApplicationError(error.message));
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of login

@@ -16,12 +16,11 @@ exports.getForumQuestions = async (req, res, next) => {
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of getForumQuestions
@@ -40,12 +39,11 @@ exports.getForumQuestionDetails = async (req, res, next) => {
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of getForumQuestionDetails
@@ -54,27 +52,25 @@ exports.createForumQuestion = async (req, res, next) => {
     logger.info("createForumQuestion running");
     const questionData = req.body;
     console.log(questionData);
-    try {        
-        console.log(questionData)
-        let results = await forumService.createPost(questionData.title, questionData.content, questionData.userId, questionData.subjectId, "OPEN");
+    console.log(questionData.userId)
+    try {
+        const results = await forumService.createPost(questionData.title, questionData.content, questionData.userId, questionData.subjectId, "OPEN");
         if (results) {
             console.log(results)
-            let message = "Question Posted Successfully."
             return res.status(200).json({  
                 "success": true,
                 "data": null,
-                "message": message 
+                "message": "Question Posted Successfully." 
             });
         }    
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of createForumQuestion
@@ -94,12 +90,11 @@ exports.editForumQuestionDetails = async (req, res, next) => {
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of editForumQuestionDetails
@@ -119,12 +114,11 @@ exports.deleteForumQuestion = async (req, res, next) => {
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
-        let message = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": message 
+            "message": "Server is unable to process the request." 
         });
     }
 }; //End of deleteForumQuestion
