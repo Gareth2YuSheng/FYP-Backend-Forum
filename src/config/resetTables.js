@@ -27,17 +27,6 @@ User.hasMany(Post, {
     },
     onDelete: "CASCADE"
 });
-// Post.belongsTo(User, {
-//     foreignKey: {
-//         name: "userId",
-//         type: DataTypes.UUID,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     },
-//     onDelete: "CASCADE"
-// });
 
 //postReply Table
 Post.hasMany(PostReply, {
@@ -51,17 +40,6 @@ Post.hasMany(PostReply, {
     },
     onDelete: "CASCADE"
 });
-// PostReply.belongsTo(Post, {
-//     foreignKey: {
-//         name: "postId",
-//         type: DataTypes.UUID,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     },
-//     onDelete: "CASCADE"
-// });
 User.hasMany(PostReply, {
     foreignKey: {
         name: "userId",
@@ -73,17 +51,6 @@ User.hasMany(PostReply, {
     },
     onDelete: "CASCADE"
 });
-// PostReply.belongsTo(User, {
-//     foreignKey: {
-//         name: "userId",
-//         type: DataTypes.UUID,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     },
-//     onDelete: "CASCADE"
-// });
 
 //user Table
 Role.hasMany(User, {
@@ -97,17 +64,6 @@ Role.hasMany(User, {
         }
     }
 });
-// User.belongsTo(Role, {
-//     foreignKey: {
-//         name: "roleId",
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//         validate: {
-//             notNull: true,
-//             isInt: true
-//         }
-//     }
-// });
 
 //vote Table
 User.hasMany(Vote, {
@@ -121,17 +77,6 @@ User.hasMany(Vote, {
     },
     onDelete: "CASCADE"
 });
-// Vote.belongsTo(User, {
-//     foreignKey: {
-//         name: "userId",
-//         type: DataTypes.UUID,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     },
-//     onDelete: "CASCADE"
-// });
 PostReply.hasMany(Vote, {
     foreignKey: {
         name: "parentId",
@@ -143,17 +88,6 @@ PostReply.hasMany(Vote, {
     },
     onDelete: "CASCADE"
 });
-// Vote.belongsTo(PostReply, {
-//     foreignKey: {
-//         name: "parentId",
-//         type: DataTypes.UUID,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     },
-//     onDelete: "CASCADE"
-// });
 
 //subject Table
 Subject.hasMany(Post, {
@@ -166,16 +100,6 @@ Subject.hasMany(Post, {
         }
     }
 });
-// Post.belongsTo(Subject, {
-//     foreignKey: {
-//         name: "subjectId",
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     }
-// });
 
 //fileTable
 Post.hasMany(File, {
@@ -188,16 +112,6 @@ Post.hasMany(File, {
         }
     }
 });
-// File.belongsTo(Post, {
-//     foreignKey: {
-//         name: "parentId",
-//         type: DataTypes.UUID,
-//         allowNull: false,
-//         validate: {
-//             notNull: true
-//         }
-//     }
-// });
 
 
 async function resetTables() {
@@ -241,7 +155,8 @@ async function resetTables() {
     //Test User, remove later
     User.create({
         email: "user1@users.com",
-        userName: "Bob The Builder",
+        firstName: "Bob",
+        lastName: "The Builder",
         password: "password",
         roleId: 1
     }).then(result => {
