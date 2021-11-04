@@ -17,6 +17,21 @@ const Vote = sequelize.define("Vote", {
             validate: {
                 notNull: true,
             }
+        },
+        //Foreign Keys
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
+        },
+        parentId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         }
     }, {
         tableName: "vote",

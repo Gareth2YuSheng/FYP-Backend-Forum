@@ -30,6 +30,21 @@ const Post = sequelize.define("Post", {
             validate: {
                 notEmpty: true
             }
+        },
+        //Foreign Keys
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
+        },
+        subjectId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         }
     }, {
         tableName: "post"

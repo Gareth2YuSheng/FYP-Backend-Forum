@@ -30,6 +30,21 @@ const PostReply = sequelize.define("PostReply", {
                 notNull: true,
                 isInt: true
             }
+        },
+        //Foreign Keys
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
+        },
+        parentId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         }
     }, {
         tableName: "postReply"

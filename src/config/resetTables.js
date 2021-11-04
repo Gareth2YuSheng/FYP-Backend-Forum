@@ -18,12 +18,7 @@ const File = require("../models/File");
 //post Table
 User.hasMany(Post, {
     foreignKey: {
-        name: "userId",
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "userId"
     },
     onDelete: "CASCADE"
 });
@@ -31,23 +26,13 @@ User.hasMany(Post, {
 //postReply Table
 Post.hasMany(PostReply, {
     foreignKey: {
-        name: "postId",
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "parentId"
     },
     onDelete: "CASCADE"
 });
 User.hasMany(PostReply, {
     foreignKey: {
-        name: "userId",
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "userId"
     },
     onDelete: "CASCADE"
 });
@@ -55,36 +40,20 @@ User.hasMany(PostReply, {
 //user Table
 Role.hasMany(User, {
     foreignKey: {
-        name: "roleId",
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-            notNull: true,
-            isInt: true
-        }
+        name: "roleId"
     }
 });
 
 //vote Table
 User.hasMany(Vote, {
     foreignKey: {
-        name: "userId",
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "userId"
     },
     onDelete: "CASCADE"
 });
 PostReply.hasMany(Vote, {
     foreignKey: {
-        name: "parentId",
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "parentId"
     },
     onDelete: "CASCADE"
 });
@@ -92,24 +61,14 @@ PostReply.hasMany(Vote, {
 //subject Table
 Subject.hasMany(Post, {
     foreignKey: {
-        name: "subjectId",
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "subjectId"
     }
 });
 
 //fileTable
 Post.hasMany(File, {
     foreignKey: {
-        name: "parentId",
-        type: DataTypes.UUID,
-        allowNull: false,
-        validate: {
-            notNull: true
-        }
+        name: "parentId"
     }
 });
 
@@ -152,7 +111,7 @@ async function resetTables() {
     Subject.create({
         subjectName: "Mathematics"
     }); 
-    //Test User, remove later
+    //Test User and Post, remove later
     User.create({
         email: "user1@users.com",
         firstName: "Bob",

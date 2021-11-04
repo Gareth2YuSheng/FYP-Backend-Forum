@@ -34,6 +34,14 @@ const File = sequelize.define("File", {
                 notNull: true,
                 notEmpty: true
             }
+        },
+        //Foreign Keys
+        parentId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         }
     },{
         tableName:"file"

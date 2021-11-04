@@ -54,6 +54,15 @@ const User = sequelize.define("User", {
             validate: {
                 isDecimal:true
             }
+        },
+        //Foreign Keys
+        roleId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                isInt: true
+            }
         }
     },{
         tableName:"user"
