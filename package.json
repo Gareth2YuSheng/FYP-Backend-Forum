@@ -33,7 +33,8 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.8.0",
     "validator": "^13.6.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.14"
