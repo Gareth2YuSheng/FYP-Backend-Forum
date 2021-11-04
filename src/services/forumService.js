@@ -1,12 +1,14 @@
-//Require DB instance
-// const sequelize = require("../config/database");
 const { DatabaseError } = require("../errors/errors");
+const { logger } = require("../logger/logger");
 const Post = require("../models/Post");
+const User = require("../models/User");
 
-module.exports.createPost = (title, content, userId, subjectId, status) => {
+exports.createPost = (title, content, userId, subjectId, status) => {
+    logger.info("createPost running");
+    //create forumn post with the details provided
     return new Promise(async (res, rej) => {
         try {
-            let result = await Post.create({
+            const result = await Post.create({
                 title: title,
                 content: content,
                 status: status,
@@ -16,7 +18,6 @@ module.exports.createPost = (title, content, userId, subjectId, status) => {
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
-        }
-        
+        }        
     });
 } //End of createPost

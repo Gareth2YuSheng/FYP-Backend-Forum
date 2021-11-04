@@ -1,6 +1,7 @@
 const { ApplicationError, DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const forumService = require("../services/forumService");
+const userService = require("../services/userService");
 
 exports.getForumQuestions = async (req, res, next) => {
     logger.info("getForumQuestions running");
@@ -50,11 +51,20 @@ exports.getForumQuestionDetails = async (req, res, next) => {
 
 exports.createForumQuestion = async (req, res, next) => {
     logger.info("createForumQuestion running");
-    const questionData = req.body;
-    console.log(questionData);
-    console.log(questionData.userId)
+    const questionData = req.body.questionData;    
+    const userData = req.body.userData; //remove later once login is setup
     try {
-        const results = await forumService.createPost(questionData.title, questionData.content, questionData.userId, questionData.subjectId, "OPEN");
+        //Make sure there is a user with the userId before creating the post
+        //Can remove the check once we start using our own login and register
+        const user = await userService.getUserIfNotCreateUser(userData);
+        //console.log(user);
+        //Create the Post
+        const results = await forumService.createPost(
+            questionData.questionTitle, 
+            questionData.questionContent, 
+            user.userId, //userId to later be retrieved from JWT token
+            questionData.subjectId, 
+            "OPEN");
         if (results) {
             console.log(results)
             return res.status(200).json({  
@@ -63,6 +73,11 @@ exports.createForumQuestion = async (req, res, next) => {
                 "message": "Question Posted Successfully." 
             });
         }    
+        // return res.status(200).json({  
+        //     "success": true,
+        //     "data": null,
+        //     "message": "Question Posted Successfully." 
+        // });  
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)

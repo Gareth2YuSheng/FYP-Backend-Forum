@@ -3,7 +3,7 @@ const testController = require("./controllers/testController"); //remove later
 const authController = require("./controllers/authController");
 const questionController = require("./controllers/questionController");
 const replyController = require("./controllers/replyController");
-const validateFn = require("./middlewares/validationFn");
+const validationFn = require("./middlewares/validationFn");
 const verifyFn = require("./middlewares/verifyToken");
 
 //Match URL with controllers
@@ -22,7 +22,7 @@ exports.appRoute = router => {
     //POST
     router.post("/login", authController.login);
     router.post("/register", authController.register);
-    router.post("/question/create", verifyFn.verifyToken, questionController.createForumQuestion);
+    router.post("/question/create", verifyFn.verifyToken, validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, replyController.createForumReply);
     
     //PUT
@@ -36,5 +36,5 @@ exports.appRoute = router => {
     router.delete("/question/:q_id/delete", verifyFn.verifyToken, questionController.deleteForumQuestion);
 
     //sanitization function
-    router.use(validateFn.sanitizeResult); 
+    router.use(validationFn.sanitizeResult); 
 };

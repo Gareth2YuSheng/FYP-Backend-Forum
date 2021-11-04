@@ -23,6 +23,21 @@ const validationFn = {
     //     }
     // },
 
+    //FORUM VALIDATIONS
+    validateCreateForumQuestion: function(req, res, next) {
+        logger.info("validateCreateForumQuestion middleware called");
+        const questionData = req.body.questionData;    
+        const userData = req.body.userData; //remove later once login is setup
+
+        next();
+        // if () {
+        //     next();
+        // } else {
+        //     logger.error("", new ApplicationError("validateRegister Failed"));
+        //     res.status(500);
+        //     res.send(`{"message":"Error!!"}`);
+        // }
+    }, //End of validateCreateForumQuestion
 
 
 
@@ -55,7 +70,7 @@ const validationFn = {
         //         }
         //     }
         // }
-    }
+    } //End of sanitizeResult
 }
  
 module.exports = validationFn;

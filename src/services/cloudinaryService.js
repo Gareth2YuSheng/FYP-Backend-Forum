@@ -1,6 +1,7 @@
 //Reference: https://cloudinary.com/documentation/node_integration
 const cloudinary = require("cloudinary").v2;
 const config = require("../config/config");
+const { logger } = require("../logger/logger");
 
 cloudinary.config({
     cloud_name: config.cloudinaryCloudName,
