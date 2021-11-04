@@ -1,43 +1,74 @@
 //For input validation and output sanitization functions
 const validator = require("validator");
 const { logger } = require("../logger/logger");
-const { ApplicationError } = require("../errors/errors");
+const { ValidationError } = require("../errors/errors");
+
+function objValidateEmptyOrNull(object) { //if Valid return true, Invalid return false
+    if (object == null) return false;
+    if (Object.keys(object).length < 1) return false;
+    return true;
+}
+
+function validateUUID(uuid) {
+    const reUuid = new RegExp(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$`);
+    return reUuid.test(uuid);
+}
 
 const validationFn = {
-    //EXAMPLE
-    // validateRegister: function (req, res, next) {
-    //     logger.info("validateRegister middleware called");
-    //     const fullName = req.body.fullName;
-    //     const email = req.body.email;
-    //     const password = req.body.password;
- 
-    //     refullName = new RegExp(`^[a-zA-Z\\s]+$`);
-    //     rePassword = new RegExp(`^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]{8,}$`);
-
-    //     if (refullName.test(fullName) && rePassword.test(password) && validator.isEmail(email)) {
-    //         next();
-    //     } else {
-    //         logger.error("", new ApplicationError("validateRegister Failed"));
-    //         res.status(500);
-    //         res.send(`{"message":"Error!!"}`);
-    //     }
-    // },
 
     //FORUM VALIDATIONS
     validateCreateForumQuestion: function(req, res, next) {
         logger.info("validateCreateForumQuestion middleware called");
+        let errorMsg = "";
+        const questionData = req.body.questionData;    
+        const userData = req.body.userData; //remove later once login is setup
+        console.log(questionData);
+        console.log(userData);
+
+        //Null or empty check
+        if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing questionData or missing userData";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateCreateForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": "Error!!" 
+            });
+        }
+    }, //End of validateCreateForumQuestion
+    
+    validateEditForumQuestion: function(req, res, next) {
+        logger.info("validateEditForumQuestion middleware called");
+        let errorMsg = "";
+        const questionId = req.params.q_id;
         const questionData = req.body.questionData;    
         const userData = req.body.userData; //remove later once login is setup
 
-        next();
-        // if () {
-        //     next();
-        // } else {
-        //     logger.error("", new ApplicationError("validateRegister Failed"));
-        //     res.status(500);
-        //     res.send(`{"message":"Error!!"}`);
-        // }
-    }, //End of validateCreateForumQuestion
+        //Null or empty check
+        if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing questionData or missing userData";
+        }
+        //Check for valid questionId 
+        else if (!validateUUID(questionId)) {
+            errorMsg = "Invalid questionId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateEditForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": "Error!!" 
+            });
+        }
+    }, //End of validateEditForumQuestion
 
 
 

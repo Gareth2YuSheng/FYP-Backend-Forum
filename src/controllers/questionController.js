@@ -1,6 +1,6 @@
 const { ApplicationError, DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
-const forumService = require("../services/forumService");
+const postService = require("../services/postService");
 const userService = require("../services/userService");
 
 exports.getForumQuestions = async (req, res, next) => {
@@ -57,27 +57,22 @@ exports.createForumQuestion = async (req, res, next) => {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register
         const user = await userService.getUserIfNotCreateUser(userData);
-        //console.log(user);
         //Create the Post
-        const results = await forumService.createPost(
+        const results = await postService.createPost(
             questionData.questionTitle, 
             questionData.questionContent, 
             user.userId, //userId to later be retrieved from JWT token
-            questionData.subjectId, 
-            "OPEN");
+            questionData.subjectId);
         if (results) {
-            console.log(results)
+            logger.info(`Successfully created post: {questionId: ${results.postId}}`);
             return res.status(200).json({  
                 "success": true,
-                "data": null,
+                "data": {
+                    postId: results.postId
+                },
                 "message": "Question Posted Successfully." 
             });
-        }    
-        // return res.status(200).json({  
-        //     "success": true,
-        //     "data": null,
-        //     "message": "Question Posted Successfully." 
-        // });  
+        }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
@@ -93,15 +88,46 @@ exports.createForumQuestion = async (req, res, next) => {
 exports.editForumQuestionDetails = async (req, res, next) => {
     logger.info("editForumQuestionDetails running");
     const questionId = req.params.q_id;
-    const questionData = req.body;
-    try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+    const questionData = req.body.questionData;
+    const userData = req.body.userData; //remove later once login is setup
+    try {       
+        //Check if post with questionId provided exists
+        const post = await postService.getPostById(questionId);
+        //If post does not exist return error
+        if (post == null) {
+            next(new ApplicationError(`Question does not exist: {questionId: ${questionId}}`));
+            return res.status(500).json({ 
+                "success": false,
+                "data": null,
+                "message": "Question does not exist." 
+            });
+        } 
+        //Check if user is author of the post
+        if (userData.userId != post.userId) {
+            next(new ApplicationError(`Unauthorized Question Edit Attempt: Unauthorized Question Edit by {userId: ${userData.userId}} on {questionId: ${questionId}}`));
+            return res.status(500).json({ 
+                "success": false,
+                "data": null,
+                "message": "Unauthorized User." 
+            });
+        }
+        //Update question data
+        const results = await postService.editPost(
+            questionData.questionTitle,
+            questionData.questionContent,
+            questionData.subjectId,
+            post
+        );
+        if (results) {
+            logger.info(`Successfully updated post: {questionId: ${results.postId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    postId: results.postId
+                },
+                "message": "Question Updated Successfully." 
+            });
+        }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
@@ -117,7 +143,6 @@ exports.editForumQuestionDetails = async (req, res, next) => {
 exports.deleteForumQuestion = async (req, res, next) => {
     logger.info("deleteForumQuestion running");
     const questionId = req.params.q_id;
-    const questionData = req.body;
     try {        
         
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings

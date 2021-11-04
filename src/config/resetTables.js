@@ -123,7 +123,6 @@ async function resetTables() {
         Post.create({
             title: "HI",
             content: "HI",
-            status: "OPEN",
             subjectId: 1,
             userId: result.userId
         })

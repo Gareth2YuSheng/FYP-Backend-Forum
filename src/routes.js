@@ -4,7 +4,7 @@ const authController = require("./controllers/authController");
 const questionController = require("./controllers/questionController");
 const replyController = require("./controllers/replyController");
 const validationFn = require("./middlewares/validationFn");
-const verifyFn = require("./middlewares/verifyToken");
+const verifyFn = require("./middlewares/verifyFn");
 
 //Match URL with controllers
 exports.appRoute = router => {
@@ -26,7 +26,7 @@ exports.appRoute = router => {
     router.post("/reply/:q_id/create", verifyFn.verifyToken, replyController.createForumReply);
     
     //PUT
-    router.put("/question/:q_id/edit", verifyFn.verifyToken, questionController.editForumQuestionDetails);
+    router.put("/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);
     router.put("/reply/:r_id/edit", verifyFn.verifyToken, replyController.editForumReply);
     router.put("/reply/:r_id/correct", verifyFn.verifyToken, replyController.markForumReplyAsCorrectAnswer);
     router.put("/reply/:r_id/upvote", verifyFn.verifyToken, replyController.upvoteForumReply);
