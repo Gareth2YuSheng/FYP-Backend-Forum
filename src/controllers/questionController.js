@@ -2,10 +2,11 @@ const { ApplicationError, DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const postService = require("../services/postService");
 const userService = require("../services/userService");
+const topicService = require("../services/topicService");
 
 exports.getForumQuestions = async (req, res, next) => {
     logger.info("getForumQuestions running");
-    const { count, page, subject } = req.query;
+    const { count, page, subject, topic } = req.query;
     try {        
         
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
@@ -30,7 +31,10 @@ exports.getForumQuestionDetails = async (req, res, next) => {
     logger.info("getForumQuestionDetails running");
     const questionId = req.params.q_id;
     try {        
-        
+        //get question data
+        const post = await postService.getPostById(questionId);
+        //get question replies
+        // const replies
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         return res.status(200).json({  
             "success": true,
@@ -53,16 +57,19 @@ exports.createForumQuestion = async (req, res, next) => {
     logger.info("createForumQuestion running");
     const questionData = req.body.questionData;    
     const userData = req.body.userData; //remove later once login is setup
+    const topicData = req.body.topicData;
     try {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register
-        const user = await userService.getUserIfNotCreateUser(userData);
+        const user = await userService.getIfNotCreateUser(userData);
+        //Make sure there is a topic with the topicId before creating the post
+        const topic = await topicService.getTopicFromTopicData(topicData);
         //Create the Post
         const results = await postService.createPost(
             questionData.questionTitle, 
             questionData.questionContent, 
             user.userId, //userId to later be retrieved from JWT token
-            questionData.subjectId);
+            topic.topicId);
         if (results) {
             logger.info(`Successfully created post: {questionId: ${results.postId}}`);
             return res.status(200).json({  
@@ -90,6 +97,7 @@ exports.editForumQuestionDetails = async (req, res, next) => {
     const questionId = req.params.q_id;
     const questionData = req.body.questionData;
     const userData = req.body.userData; //remove later once login is setup
+    const topicData = req.body.topicData;
     try {       
         //Check if post with questionId provided exists
         const post = await postService.getPostById(questionId);
@@ -111,11 +119,20 @@ exports.editForumQuestionDetails = async (req, res, next) => {
                 "message": "Unauthorized User." 
             });
         }
+        //Check if post topicId is the same as the new topic data
+        const incoming_topicId = topicData.children.slice(-1)[0].topicId;
+        let topicId;
+        if (incoming_topicId != post.topicId) { //if new topicId sent update new topic
+            const topic = await topicService.getTopicFromTopicData(topicData);
+            topicId = topic.topicId;
+        } else { //else use back the old topic id
+            topicId = post.topicId;
+        }
         //Update question data
         const results = await postService.editPost(
             questionData.questionTitle,
             questionData.questionContent,
-            questionData.subjectId,
+            topicId,
             post
         );
         if (results) {
@@ -128,6 +145,13 @@ exports.editForumQuestionDetails = async (req, res, next) => {
                 "message": "Question Updated Successfully." 
             });
         }
+        return res.status(200).json({  
+            "success": true,
+            "data": {
+                postId: "yes"
+            },
+            "message": "Question Updated Successfully." 
+        });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)

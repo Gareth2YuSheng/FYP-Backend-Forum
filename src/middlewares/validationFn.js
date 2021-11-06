@@ -22,8 +22,6 @@ const validationFn = {
         let errorMsg = "";
         const questionData = req.body.questionData;    
         const userData = req.body.userData; //remove later once login is setup
-        console.log(questionData);
-        console.log(userData);
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {

@@ -1,26 +1,34 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const Subject = sequelize.define("Subject", {
-        subjectId: {
+const Topic = sequelize.define("Topic", {
+        topicId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             unique: true,
             primaryKey: true
         },
-        subjectName: {
+        topicName: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: true,
                 notEmpty: true
             }
+        },
+        //Foreign Keys
+        subjectId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         }
-    },{
-        tableName:"subject",
+    }, {
+        tableName: "topic",
         timestamps: false
     }
 );
 
-module.exports = Subject;
+module.exports = Topic;

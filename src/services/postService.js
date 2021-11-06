@@ -1,9 +1,8 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const Post = require("../models/Post");
-const User = require("../models/User");
 
-exports.createPost = (title, content, userId, subjectId) => {
+exports.createPost = (title, content, userId, topicId) => {
     logger.info("createPost running");
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
@@ -11,7 +10,7 @@ exports.createPost = (title, content, userId, subjectId) => {
             const result = await Post.create({
                 title: title,
                 content: content,
-                subjectId: subjectId,
+                topicId: topicId,
                 userId: userId
             });
             res(result);
@@ -23,10 +22,10 @@ exports.createPost = (title, content, userId, subjectId) => {
 
 exports.getPostById = (postId) => {
     logger.info("getPostById running");
-    //get forumn post with the postId provided
+    //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await Post.findOne({ where: { postId: postId } });
+            const result = await Post.findByPk(postId);
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
@@ -34,16 +33,36 @@ exports.getPostById = (postId) => {
     });
 } //End of getPostById
 
-exports.editPost = (title, content, subjectId, post) => {
+exports.getPosts = (count, page, subject="", topic="") => {
+    logger.info("getPosts running");
+    const offset = (count*(page-1));
+    //get forum post with the postId provided
+    return new Promise(async (res, rej) => {
+        try {
+            let result;
+            if (subject==="" && topic==="") {
+               result = await Post.findAll({ limit: count, offset: offset }); 
+            } else {
+                // result = await Post
+            }
+            
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getPosts
+
+exports.editPost = (title, content, topicId, post) => {
     logger.info("editPost running");
-    //update forumn post instance with the details provided
+    //update forum post instance with the details provided
     return new Promise(async (res, rej) => {
         try {
             //update the fields in the post instance
             post.set({
                 title: title,
                 content: content,
-                subjectId: subjectId
+                topicId: topicId
             });
             //save the changes to the DB
             const result = await post.save();
@@ -56,7 +75,7 @@ exports.editPost = (title, content, subjectId, post) => {
 
 exports.deletePost = (post) => {
     logger.info("deletePost running");
-    //delete forumn post instance provided
+    //delete forum post instance provided
     return new Promise(async (res, rej) => {
         try {
             const result = await post.destroy();

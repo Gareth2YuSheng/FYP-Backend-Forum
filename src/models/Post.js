@@ -31,8 +31,8 @@ const Post = sequelize.define("Post", {
                 notNull: true
             }
         },
-        subjectId: {
-            type: DataTypes.INTEGER,
+        topicId: {
+            type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notNull: true
