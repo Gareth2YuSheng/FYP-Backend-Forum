@@ -1,12 +1,13 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const sequelize = require("../config/sequelize");
+
+const Topic = require("./Topic");
 
 const TopicAssociation = sequelize.define("TopicAssociation", {
         topicId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
-            unique: true,
             primaryKey: true
         },
         parentId: {

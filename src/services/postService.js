@@ -1,13 +1,14 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
-const Post = require("../models/Post");
+const sequelize = require("../config/database");
+const models = sequelize.models;
 
 exports.createPost = (title, content, userId, topicId) => {
     logger.info("createPost running");
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await Post.create({
+            const result = await models.Post.create({
                 title: title,
                 content: content,
                 topicId: topicId,
@@ -25,7 +26,7 @@ exports.getPostById = (postId) => {
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await Post.findByPk(postId);
+            const result = await models.Post.findByPk(postId);
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
@@ -33,19 +34,31 @@ exports.getPostById = (postId) => {
     });
 } //End of getPostById
 
-exports.getPosts = (count, page, subject="", topic="") => {
+exports.getPosts = (count, page, subject, topic) => {
     logger.info("getPosts running");
     const offset = (count*(page-1));
+    if (subject == null) subject = "";
+    if (topic == null) topic = "";
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
             let result;
-            if (subject==="" && topic==="") {
-               result = await Post.findAll({ limit: count, offset: offset }); 
+            if (subject==="" && topic==="") { //if no subject or topic was provided
+                result = await models.Post.findAll({ limit: count, offset: offset, include: models.Topic });
             } else {
-                // result = await Post
-            }
-            
+                whereOptions = {}
+                if (subject!=="" && topic==="") whereOptions = { subjectId: subject }
+                else if (subject==="" && topic!=="") whereOptions = { topicId: topic }
+                else whereOptions = { topicId: topic, subjectId: subject }
+                result = await models.Post.findAll({ 
+                    limit: count, 
+                    offset: offset,
+                    include: {
+                        model: models.Topic,
+                        where: whereOptions
+                    }
+                });
+            }        
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));

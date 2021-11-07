@@ -7,8 +7,18 @@ const topicService = require("../services/topicService");
 exports.getForumQuestions = async (req, res, next) => {
     logger.info("getForumQuestions running");
     const { count, page, subject, topic } = req.query;
-    try {        
-        
+    try { //sanitize results later
+        const results = await postService.getPosts(count, page, subject, topic);
+        if (results) {
+            logger.info(`Successfully retrieved posts: {count:${count}, page:${page}, subject:${subject}, topic:${topic}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    posts: results
+                },
+                "message": null 
+            });
+        }
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         return res.status(200).json({  
             "success": true,

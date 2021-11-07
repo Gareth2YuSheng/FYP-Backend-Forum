@@ -1,6 +1,7 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
-const User = require("../models/User");
+const sequelize = require("../config/database");
+const models = sequelize.models;
 
 exports.createUser = (firstName, lastName, email, password, roleId, userId=null) => {
     logger.info("createUser running");
@@ -9,7 +10,7 @@ exports.createUser = (firstName, lastName, email, password, roleId, userId=null)
         try {
             let result;
             if (userId) { //if userId was provided
-                result = await User.create({
+                result = await models.User.create({
                     userId: userId,
                     email: email,
                     firstName: firstName,
@@ -18,7 +19,7 @@ exports.createUser = (firstName, lastName, email, password, roleId, userId=null)
                     roleId: roleId
                 });
             } else { //if userId was not provided
-                result = await User.create({
+                result = await models.User.create({
                     email: email,
                     firstName: firstName,
                     lastName: lastName,
@@ -38,7 +39,7 @@ exports.getUserByUserId = (userId) => {
     //get a user with the userId provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await User.findByPk(userId);
+            const result = await models.User.findByPk(userId);
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
@@ -52,7 +53,7 @@ exports.getIfNotCreateUser = (userData) => {
     //check if there is a user with the provided userId, if there isnt create one with the id and user data
     return new Promise(async (res, rej) => {
         try {
-            const [user, created] = await User.findOrCreate({
+            const [user, created] = await models.User.findOrCreate({
                 where: { userId: userData.userId },
                 defaults: {
                     email: userData.email,

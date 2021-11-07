@@ -1,8 +1,7 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
-const Topic = require("../models/Topic");
-const Subject = require("../models/Subject");
-const TopicAssociation = require("../models/TopicAssociation");
+const sequelize = require("../config/database");
+const models = sequelize.models;
 
 // exports.createSubject = (subjectName, subjectId=null) => {
 //     logger.info("createSubject running");
@@ -45,7 +44,7 @@ exports.getIfNotCreateSubject = (subjectId, subjectName) => {
     //get subject details if not create new subject with the details provided
     return new Promise(async (res, rej) => {
         try {
-            const [subject, created] = await Subject.findOrCreate({
+            const [subject, created] = await models.Subject.findOrCreate({
                 where: { subjectId: subjectId },
                 defaults: { subjectName: subjectName }
             });
@@ -74,7 +73,7 @@ exports.getIfNotCreateTopic = (topicId, topicName, subjectId) => {
     //get topic details if not create new topic with the details provided
     return new Promise(async (res, rej) => {
         try {
-            const [topic, created] = await Topic.findOrCreate({
+            const [topic, created] = await models.Topic.findOrCreate({
                 where: { topicId: topicId },
                 defaults: { 
                     topicName: topicName,
@@ -93,7 +92,7 @@ exports.getIfNotCreateTopicAssociation = (topicId, parentId) => {
     //get topic association details if not create new association with the details provided
     return new Promise(async (res, rej) => {
         try {
-            const [topicAssc, created] = await TopicAssociation.findOrCreate({
+            const [topicAssc, created] = await models.TopicAssociation.findOrCreate({
                 where: { 
                     topicId: topicId,
                     parentId: parentId
