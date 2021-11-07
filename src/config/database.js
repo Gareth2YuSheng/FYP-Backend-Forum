@@ -114,7 +114,7 @@ sequelize.models.Post.belongsTo(sequelize.models.Topic, {
     foreignKey: {
         name: "topicId"
     }
-})
+});
 sequelize.models.Topic.hasMany(sequelize.models.TopicAssociation, {
     foreignKey: {
         as: "topic",

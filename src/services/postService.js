@@ -3,7 +3,7 @@ const { logger } = require("../logger/logger");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
-exports.createPost = (title, content, userId, topicId) => {
+exports.createPost = (title, content, objective, userId, topicId) => {
     logger.info("createPost running");
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
@@ -12,7 +12,8 @@ exports.createPost = (title, content, userId, topicId) => {
                 title: title,
                 content: content,
                 topicId: topicId,
-                userId: userId
+                userId: userId,
+                objective: objective
             });
             res(result);
         } catch (error) {
@@ -66,7 +67,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
     });
 } //End of getPosts
 
-exports.editPost = (title, content, topicId, post) => {
+exports.editPost = (title, content, objective, topicId, post) => {
     logger.info("editPost running");
     //update forum post instance with the details provided
     return new Promise(async (res, rej) => {
@@ -75,6 +76,7 @@ exports.editPost = (title, content, topicId, post) => {
             post.set({
                 title: title,
                 content: content,
+                objective: objective,
                 topicId: topicId
             });
             //save the changes to the DB

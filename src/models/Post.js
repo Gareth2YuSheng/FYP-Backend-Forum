@@ -23,6 +23,13 @@ const Post = sequelize.define("Post", {
                 notEmpty: true
             }
         },
+        objective: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
+        },
         //Foreign Keys
         userId: {
             type: DataTypes.UUID,
