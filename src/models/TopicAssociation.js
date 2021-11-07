@@ -1,8 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const Topic = require("./Topic");
-
 const TopicAssociation = sequelize.define("TopicAssociation", {
         topicId: {
             type: DataTypes.UUID,

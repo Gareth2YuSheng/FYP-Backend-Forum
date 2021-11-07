@@ -34,7 +34,7 @@ exports.getPostById = (postId) => {
     });
 } //End of getPostById
 
-exports.getPosts = (count, page, subject, topic) => {
+exports.getPosts = (count, page, subject, topic) => { //send user data as well
     logger.info("getPosts running");
     const offset = (count*(page-1));
     if (subject == null) subject = "";

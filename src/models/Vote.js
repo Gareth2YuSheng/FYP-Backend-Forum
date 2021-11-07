@@ -1,9 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const User = require("./User");
-const PostReply = require("./PostReply");
-
 const Vote = sequelize.define("Vote", {
         voteId: {
             type: DataTypes.INTEGER,

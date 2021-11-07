@@ -1,9 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const User = require("./User");
-const Post = require("./Post");
-
 const PostReply = sequelize.define("PostReply", {
         replyId: {
             type: DataTypes.UUID,
