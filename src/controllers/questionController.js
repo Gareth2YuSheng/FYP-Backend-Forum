@@ -20,11 +20,11 @@ exports.getForumQuestions = async (req, res, next) => {
             });
         }
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+        // return res.status(200).json({  
+        //     "success": true,
+        //     "data": null,
+        //     "message": null 
+        // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)

@@ -45,7 +45,20 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
         try {
             let result;
             if (subject==="" && topic==="") { //if no subject or topic was provided
-                result = await models.Post.findAll({ limit: count, offset: offset, include: models.Topic });
+                result = await models.Post.findAll({ 
+                    limit: count, 
+                    offset: offset, 
+                    include: [{
+                        attributes: ["topicName"],
+                        model: models.Topic,
+                        include: {
+                            model: models.Subject
+                        }
+                    },{
+                        attributes: ["firstName", "lastName", "profileImage"],
+                        model: models.User
+                    }]
+                });
             } else {
                 whereOptions = {}
                 if (subject!=="" && topic==="") whereOptions = { subjectId: subject }
@@ -54,10 +67,17 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                 result = await models.Post.findAll({ 
                     limit: count, 
                     offset: offset,
-                    include: {
+                    include: [{
+                        attributes: ["topicName"],
                         model: models.Topic,
-                        where: whereOptions
-                    }
+                        where: whereOptions,
+                        include: {
+                            model: models.Subject
+                        }
+                    },{
+                        attributes: ["firstName", "lastName", "profileImage"],
+                        model: models.User
+                    }]
                 });
             }        
             res(result);

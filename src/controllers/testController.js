@@ -26,12 +26,7 @@ exports.testRouteFuncPost = async (req, res, next) => {
     logger.info("testRouteFuncPost running");
 
     try {
-        //<----- code logic
-        const email = req.body.email;
-        const password = req.body.password; 
-        console.log(email);
-        console.log(password);
-        //code logic ----->
+        console.log(req.body);
         next(); //call sanitization middleware, only sanitize of there is output data that is strings
         return res.status(200).json({email, password});
     } catch (error) {
