@@ -10,6 +10,7 @@ const verifyFn = require("./middlewares/verifyFn");
 exports.appRoute = router => {
     //Testing routes remove later
     router.get("/api/test", testController.testRouteFunc);
+    router.get("/api/subject_grade", testController.subjectsGrade);
     router.post("/api/test", testController.testRouteFuncPost);
     router.put("/api/test", testController.testRouteFuncPut);
     router.delete("/api/test", testController.testRouteFuncDelete);
