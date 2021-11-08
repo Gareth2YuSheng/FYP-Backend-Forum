@@ -31,7 +31,7 @@ const validationFn = {
             errorMsg = "Missing data in questionData";
         } else if (!topicData.subjectId || !topicData.subjectName || !topicData.children) {
             errorMsg = "Missing data in topicData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roldId) {
+        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
         }
 
