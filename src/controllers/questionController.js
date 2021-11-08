@@ -68,6 +68,8 @@ exports.createForumQuestion = async (req, res, next) => {
     const questionData = req.body.questionData;    
     const userData = req.body.userData; //remove later once login is setup
     const topicData = req.body.topicData;
+    // console.log(req);
+    console.log(req.files);
     try {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register
