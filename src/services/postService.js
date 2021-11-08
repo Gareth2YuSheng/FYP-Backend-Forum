@@ -5,6 +5,8 @@ const models = sequelize.models;
 
 exports.createPost = (title, content, objective, userId, topicId) => {
     logger.info("createPost running");
+    // console.log(req);
+    console.log(req.files);
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
         try {

@@ -6,6 +6,10 @@ const replyController = require("./controllers/replyController");
 const validationFn = require("./middlewares/validationFn");
 const verifyFn = require("./middlewares/verifyFn");
 
+//import mutler 
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2000000, files: 1 } });
+
 //Match URL with controllers
 exports.appRoute = router => {
     //Testing routes remove later
@@ -23,7 +27,7 @@ exports.appRoute = router => {
     //POST
     router.post("/login", authController.login);
     router.post("/register", authController.register);
-    router.post("/question/create", verifyFn.verifyToken, validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
+    router.post("/question/create", upload.array("file", 5), verifyFn.verifyToken, validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, replyController.createForumReply);
     
     //PUT

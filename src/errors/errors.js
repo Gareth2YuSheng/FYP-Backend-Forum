@@ -29,9 +29,18 @@ class DatabaseConnectionError extends DatabaseError {
     }
 }
 
+class CloudinaryError extends ApplicationError {
+    constructor(message) {
+        super(message);
+        Error.captureStackTrace(this);
+    }
+}
+
+
 module.exports = {
     ApplicationError,
     DatabaseError,
     DatabaseConnectionError,
-    ValidationError
+    ValidationError,
+    CloudinaryError
 };

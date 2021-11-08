@@ -1,7 +1,9 @@
 //Reference: https://cloudinary.com/documentation/node_integration
 const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 const config = require("../config/config");
 const { logger } = require("../logger/logger");
+const { CloudinaryError } = require("../errors/errors");
 
 cloudinary.config({
     cloud_name: config.cloudinaryCloudName,
@@ -14,4 +16,44 @@ upload_forum_image
 cloudinary.uploader.upload(file.path, { upload_preset: 'upload_forum_image' })
 */
 
+// module.exports.uploadFileToCloudinary = function(file) {
+//     logger.info("uploadFileToCloudinary running");
+//     //upload the give file to cloudinary
+//     return new Promise((res, rej) => {
+//         cloudinary.uploader.upload(file.path, { upload_preset: 'upload_forum_image' })
+//             .then((result) => {
+//                 console.log(result);
+//                 //Inspect whether I can obtain the file storage id and the url from cloudinary
+//                 //after a successful upload.
+//                 //console.log({imageURL: result.url, publicId: result.public_id});
+//                 let data = { imageURL: result.url, publicId: result.public_id, status: 'success' };
+//                 res(data);
+//             }).catch((error) => {
+//                 rej(new DatabaseError(error.message));
+//             }); //End of try..catch
+//     });
+// } //End of uploadFileToCloudinary
 
+module.exports.uploadStreamToCloudinary = function(buffer) {
+    logger.info("uploadStreamToCloudinary running");
+    //upload the give file that is stored in buffer to cloudinary
+    return new Promise(function(res, rej) {
+        //Create a powerful, writable stream object which works with Cloudinary
+        let streamDestination = cloudinary.uploader.upload_stream({
+                folder: 'forumPhotos',
+                allowed_formats: 'png,jpg',
+                resource_type: 'image'
+            },
+            function(error, result) {
+                if (result) {
+                    console.log(results);
+                    let cloudinaryFileData = { url: result.url, publicId: result.public_id, status: 'success' };
+                    res(cloudinaryFileData);
+                }
+                if (error) {
+                    rej(new CloudinaryError(error.msg));
+                }
+            });
+        streamifier.createReadStream(buffer).pipe(streamDestination);
+    });
+} //End of uploadStreamToCloudinary
