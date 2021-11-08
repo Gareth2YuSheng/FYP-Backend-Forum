@@ -28,7 +28,7 @@ exports.testRouteFuncPost = async (req, res, next) => {
     try {
         console.log(req.body);
         next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({email, password});
+        return res.status(200).json({email: "HI"});
     } catch (error) {
         next(new ApplicationError(error.message));
         let message = 'Server is unable to process the request.';

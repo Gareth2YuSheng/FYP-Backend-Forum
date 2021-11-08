@@ -21,11 +21,18 @@ const validationFn = {
         logger.info("validateCreateForumQuestion middleware called");
         let errorMsg = "";
         const questionData = req.body.questionData;    
+        const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
         //Null or empty check
-        if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
+        if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(topicData)) {
             errorMsg = "Missing questionData or missing userData";
+        } else if (!questionData.questionTitle || !questionData.questionContent || !questionData.questionObjective) {
+            errorMsg = "Missing data in questionData";
+        } else if (!topicData.subjectId || !topicData.subjectName || !topicData.children) {
+            errorMsg = "Missing data in topicData";
+        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roldId) {
+            errorMsg = "Missing data in userData";
         }
 
         if (errorMsg === "") { //if no error message move on
