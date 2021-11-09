@@ -18,6 +18,7 @@ const PostReply = sequelize.define("PostReply", {
         },
         isAnswer: {
             type: DataTypes.BOOLEAN,
+            defaultValue: false,
             allowNull: false,
             validate: {
                 notNull: true
@@ -25,6 +26,7 @@ const PostReply = sequelize.define("PostReply", {
         },
         voteCount: {
             type: DataTypes.INTEGER,
+            defaultValue: 0,
             allowNull: false,
             validate: {
                 notNull: true,
