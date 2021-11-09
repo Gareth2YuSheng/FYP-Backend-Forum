@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require('morgan');
+const multer = require("multer");
 //const config = require('./src/config/config');
 
 const { logger, requestLogger } = require("./src/logger/logger");
@@ -43,10 +44,21 @@ bootstrap(app, router);
 
 
 router.use((err, req, res, next) => {
-    if (!(err instanceof ApplicationError)) {
-        next(err);
+    if (err instanceof multer.MulterError) { //handle mutler errors here
+        res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": err.message 
+        });
+    } else if (!(err instanceof ApplicationError)) {
+        // next(err);
+        res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": "Error!!!!" 
+        });
     } 
-    //log error here
+    //log error here, runs even if the if block was triggered
     logger.error("", err);
 });
 

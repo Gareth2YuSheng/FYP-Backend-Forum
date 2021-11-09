@@ -6,9 +6,23 @@ const replyController = require("./controllers/replyController");
 const validationFn = require("./middlewares/validationFn");
 const verifyFn = require("./middlewares/verifyFn");
 
+const path = require("path");
+const { FileError } = require("./errors/errors");
+
 //import mutler 
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2000000, files: 1 } });
+const upload = multer({ 
+    storage: multer.memoryStorage(), 
+    limits: { fileSize: 2000000, files: 2 }, //set limit for file size and number of file fields 
+    fileFilter: (req, file, cb) => { //limit the file extentions
+        let ext = path.extname(file.originalname);
+        if (ext !== ".jpg" && ext !== ".png" && ext !== ".jpeg") {
+            cb(new FileError("File Type Not Supported!"), false);
+            return;
+        }
+        cb(null, true);
+    }
+});
 
 //Match URL with controllers
 exports.appRoute = router => {
