@@ -3,7 +3,7 @@ const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const config = require("../config/config");
 const { logger } = require("../logger/logger");
-const { CloudinaryError } = require("../errors/errors");
+const { CloudinaryError, ApplicationError } = require("../errors/errors");
 
 cloudinary.config({
     cloud_name: config.cloudinaryCloudName,
@@ -38,15 +38,16 @@ module.exports.uploadStreamToCloudinary = function(buffer) {
     logger.info("uploadStreamToCloudinary running");
     //upload the give file that is stored in buffer to cloudinary
     return new Promise(function(res, rej) {
-        //Create a powerful, writable stream object which works with Cloudinary
-        let streamDestination = cloudinary.uploader.upload_stream({
+        try {
+            //Create a powerful, writable stream object which works with Cloudinary
+            let streamDestination = cloudinary.uploader.upload_stream({
                 folder: 'forumPhotos',
-                allowed_formats: 'png,jpg',
-                resource_type: 'image'
+                allowed_formats: 'png,jpg,jpeg',
+                resource_type: 'image',
+                // use_filename: true
             },
             function(error, result) {
                 if (result) {
-                    console.log(results);
                     let cloudinaryFileData = { url: result.url, publicId: result.public_id, status: 'success' };
                     res(cloudinaryFileData);
                 }
@@ -54,6 +55,9 @@ module.exports.uploadStreamToCloudinary = function(buffer) {
                     rej(new CloudinaryError(error.msg));
                 }
             });
-        streamifier.createReadStream(buffer).pipe(streamDestination);
+            streamifier.createReadStream(buffer).pipe(streamDestination);
+        } catch (error) {
+            rej(new ApplicationError(error.message));
+        }
     });
 } //End of uploadStreamToCloudinary

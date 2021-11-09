@@ -20,9 +20,19 @@ const validationFn = {
     validateCreateForumQuestion: function(req, res, next) {
         logger.info("validateCreateForumQuestion middleware called");
         let errorMsg = "";
+        
+        //parse the data from formData
+        req.body.questionData = JSON.parse(req.body.questionData);    
+        req.body.topicData = JSON.parse(req.body.topicData);
+        req.body.userData = JSON.parse(req.body.userData);
+
         const questionData = req.body.questionData;    
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
+
+        // console.log(questionData);
+        // console.log(userData);
+        // console.log(topicData);
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(topicData)) {

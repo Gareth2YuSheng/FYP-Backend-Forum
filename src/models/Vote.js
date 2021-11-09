@@ -3,13 +3,11 @@ const sequelize = require("../config/sequelize");
 
 const Vote = sequelize.define("Vote", {
         voteId: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             allowNull: false,
-            primaryKey: true,
-            validate: {
-                isInt: true
-            }
+            unique: true,
+            primaryKey: true
         },
         type: {
             type: DataTypes.BOOLEAN,

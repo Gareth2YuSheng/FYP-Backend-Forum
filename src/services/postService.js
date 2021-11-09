@@ -1,21 +1,40 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
+const cloudinaryService = require("./cloudinaryService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
-exports.createPost = (title, content, objective, userId, topicId) => {
+exports.createPost = (title, content, objective, userId, topicId, files) => {
     logger.info("createPost running");
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await models.Post.create({
+            //create post
+            const post = await models.Post.create({
                 title: title,
                 content: content,
                 topicId: topicId,
                 userId: userId,
                 objective: objective
             });
-            res(result);
+            //upload files to cloudinary and store filedata in DB
+            if (files) {
+                let fileUploadResult, cloudinaryResult;
+                for (let i=0; i<files.length; i++) {
+                    //files[i].originalname = `${post.postId}_${files[i].originalname}`;
+                    //upload to cloudinary
+                    fileUploadResult = await cloudinaryService.uploadStreamToCloudinary(files[i].buffer);
+                    //save file data in DB
+                    cloudinaryResult = await models.File.create({
+                        cloudinaryFileId: fileUploadResult.publicId,
+                        cloudinaryUrl: fileUploadResult.url,
+                        fileName: files[i].originalname,
+                        mimeType: files[i].mimetype,
+                        parentId: post.postId
+                    });
+                }
+            }
+            res(post);
         } catch (error) {
             rej(new DatabaseError(error.message));
         }        
