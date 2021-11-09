@@ -68,31 +68,38 @@ exports.createForumQuestion = async (req, res, next) => {
     const questionData = req.body.questionData;    
     const userData = req.body.userData; //remove later once login is setup
     const topicData = req.body.topicData;
-    // console.log(req);
+    console.log(req.body);
     console.log(req.files);
     try {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register
-        const user = await userService.getIfNotCreateUser(userData);
-        //Make sure there is a topic with the topicId before creating the post
-        const topic = await topicService.getTopicFromTopicData(topicData);
-        //Create the Post
-        const results = await postService.createPost(
-            questionData.questionTitle, 
-            questionData.questionContent, 
-            questionData.questionObjective,
-            user.userId, //userId to later be retrieved from JWT token
-            topic.topicId);
-        if (results) {
-            logger.info(`Successfully created post: {questionId: ${results.postId}}`);
-            return res.status(200).json({  
-                "success": true,
-                "data": {
-                    postId: results.postId
-                },
-                "message": "Question Posted Successfully." 
-            });
-        }
+        // const user = await userService.getIfNotCreateUser(userData);
+        // //Make sure there is a topic with the topicId before creating the post
+        // const topic = await topicService.getTopicFromTopicData(topicData);
+        // //Create the Post
+        // const results = await postService.createPost(
+        //     questionData.questionTitle, 
+        //     questionData.questionContent, 
+        //     questionData.questionObjective,
+        //     user.userId, //userId to later be retrieved from JWT token
+        //     topic.topicId);
+        // if (results) {
+        //     logger.info(`Successfully created post: {questionId: ${results.postId}}`);
+        //     return res.status(200).json({  
+        //         "success": true,
+        //         "data": {
+        //             postId: results.postId
+        //         },
+        //         "message": "Question Posted Successfully." 
+        //     });
+        // }
+        return res.status(200).json({  
+            "success": true,
+            "data": {
+                postId: "yes"
+            },
+            "message": "Question Posted Successfully." 
+        });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
