@@ -3,6 +3,7 @@ const { logger } = require("../logger/logger");
 const userService = require("../services/userService");
 const postService = require("../services/postService");
 const replyService = require("../services/replyService");
+const PostReply = require("../models/PostReply");
 
 exports.getForumQuestionReplies = async (req, res, next) => {
     logger.info("getForumQuestionReplies running");
@@ -116,14 +117,47 @@ exports.downvoteForumReply = async (req, res, next) => {
 exports.editForumReply = async (req, res, next) => {
     logger.info("editForumReply running");
     const replyId = req.params.r_id;
+    const replyData = req.body.replyData;
+    const userData = req.body.userData;
     try {        
-        
+        //Make sure there is a user with the userId before creating the reply
+        const user = await userService.getIfNotCreateUser(userData);
+        //Check if reply with replyId provided exists
+        const reply = await replyService.getReplyById(replyId);
+        //If reply does not exist return error
+        if (reply == null) {
+            next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
+            return res.status(500).json({
+                "success": false,
+                "data": null,
+                "message": "Reply does not exist."
+            });
+        }
+        // Check if user is author of the postReply
+        if (userData.userId != reply.userId) {
+            next(new ApplicationError(`Unauthorized Reply Edit Attempt: Unauthorized Reply Edit by {userId: ${userData.userId}} on {replyId: ${reply.replyId}}`));
+            return res.status(500).json({ 
+                "success": false,
+                "data": null,
+                "message": "Unauthorized User." 
+            });
+        }
+        //Update reply data
+        const results = await replyService.editForumReply(
+            replyData.replyContent,
+            user.userId,
+            reply);
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+        if (results) {
+            logger.info(`Successfully updated reply: {replyId: ${results.replyId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    replyId: results.replyId
+                },
+                "message": "Reply Updated Successfully."
+            });
+        }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
