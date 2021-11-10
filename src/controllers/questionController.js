@@ -70,12 +70,7 @@ exports.createForumQuestion = async (req, res, next) => {
     const userData = req.body.userData; //remove later once login is setup
     const topicData = req.body.topicData;
     const files = req.files; //from multer
-    // console.log(req);
-    // console.log("FILES")
-    // console.log(files);
-    // console.log(questionData);
-    // console.log(userData);
-    // console.log(topicData);
+    const base64Files = req.body.file; //from req body from frontend
     try {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register
@@ -89,7 +84,8 @@ exports.createForumQuestion = async (req, res, next) => {
             questionData.questionObjective,
             user.userId, //userId to later be retrieved from JWT token
             topic.topicId,
-            files);
+            files,
+            base64Files);
         if (results) {
             logger.info(`Successfully created post: {questionId: ${results.postId}}`);
             return res.status(200).json({  
@@ -100,13 +96,6 @@ exports.createForumQuestion = async (req, res, next) => {
                 "message": "Question Posted Successfully." 
             });
         }
-        // return res.status(200).json({  
-        //     "success": true,
-        //     "data": {
-        //         postId: "YES"
-        //     },
-        //     "message": "Question Posted Successfully." 
-        // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)

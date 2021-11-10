@@ -1,11 +1,11 @@
-const { DatabaseError } = require("../errors/errors");
+const { DatabaseError, CloudinaryError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const cloudinaryService = require("./cloudinaryService");
 const fileService = require("../services/fileService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
-exports.createPost = (title, content, objective, userId, topicId, files) => {
+exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
@@ -19,7 +19,7 @@ exports.createPost = (title, content, objective, userId, topicId, files) => {
                 objective: objective
             });
             //upload files to cloudinary and store filedata in DB
-            if (files) {
+            if (files.length > 0) { //from multer
                 let fileUploadResult, result;
                 for (let i=0; i<files.length; i++) {
                     //upload to cloudinary
@@ -32,9 +32,24 @@ exports.createPost = (title, content, objective, userId, topicId, files) => {
                         files[i].mimetype,
                         post.postId);
                 }
+            } else if (filesBase64.length > 0) { //from frontend
+                let fileUploadResult, result;
+                for (let i=0; i<filesBase64.length; i++) {
+                    console.log(filesBase64[i]);
+                    //upload to cloudinary as base64 encoded string
+                    fileUploadResult = await cloudinaryService.uploadFileToCloudinary(filesBase64[i].uri);  
+                    //save file data in DB
+                    result = await fileService.createFile(
+                        fileUploadResult.publicId,
+                        fileUploadResult.url,
+                        filesBase64[i].name,
+                        filesBase64[i].type,
+                        post.postId);
+                }
             }
             res(post);
         } catch (error) {
+            console.log(error)
             rej(new DatabaseError(error.message));
         }        
     });
