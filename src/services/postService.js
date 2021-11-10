@@ -21,6 +21,7 @@ exports.createPost = (title, content, objective, userId, topicId, files) => {
             if (files) {
                 let fileUploadResult, cloudinaryResult;
                 for (let i=0; i<files.length; i++) {
+                    console.log(files[i])
                     //files[i].originalname = `${post.postId}_${files[i].originalname}`;
                     //upload to cloudinary
                     fileUploadResult = await cloudinaryService.uploadStreamToCloudinary(files[i].buffer);

@@ -25,11 +25,14 @@ const validationFn = {
         req.body.questionData = JSON.parse(req.body.questionData);    
         req.body.topicData = JSON.parse(req.body.topicData);
         req.body.userData = JSON.parse(req.body.userData);
+        //req.body.file = JSON.parse(req.body.file);
 
         const questionData = req.body.questionData;    
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
+        console.log(req.body)
+        console.log(req.files)
         // console.log(questionData);
         // console.log(userData);
         // console.log(topicData);

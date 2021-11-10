@@ -70,6 +70,7 @@ exports.createForumQuestion = async (req, res, next) => {
     const topicData = req.body.topicData;
     const files = req.files; //from multer
     // console.log(req);
+    console.log("HI")
     console.log(files);
     // console.log(questionData);
     // console.log(userData);

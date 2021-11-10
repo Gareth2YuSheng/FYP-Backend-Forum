@@ -48,7 +48,7 @@ module.exports.uploadStreamToCloudinary = function(buffer) {
             },
             function(error, result) {
                 if (result) {
-                    logger.info(`Successfully uploaded post image: {questionId: ${result.url}}`);
+                    logger.info(`Successfully uploaded post image: {image_url: ${result.url}}`);
                     let cloudinaryFileData = { url: result.url, publicId: result.public_id, status: 'success' };
                     res(cloudinaryFileData);
                 }
