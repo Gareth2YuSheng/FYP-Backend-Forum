@@ -82,12 +82,16 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset, 
                     include: [{
-                        attributes: ["topicName"],
-                        model: models.Topic,
-                        include: {
+                        attributes: ["cloudinaryUrl"],
+                        model: models.File
+                    }, {
+                        attributes: ["topicName", "subjectId"],
+                        model: models.Topic,               
+                        include: [{
+                            attributes: ["subjectName"],
                             model: models.Subject
-                        }
-                    },{
+                        }]
+                    }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
                     }]
@@ -99,15 +103,21 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                 else whereOptions = { topicId: topic, subjectId: subject }
                 posts = await models.Post.findAll({ 
                     limit: count, 
-                    offset: offset,
-                    include: [{
-                        attributes: ["topicName"],
-                        model: models.Topic,
-                        where: whereOptions,
-                        include: {
+                    offset: offset,                 
+                    include: [
+                    {
+                        attributes: ["cloudinaryUrl"],
+                        model: models.File
+                    },
+                    {
+                        attributes: ["topicName", "subjectId"],
+                        model: models.Topic,      
+                        where: whereOptions,                  
+                        include: [{
+                            attributes: ["subjectName"],
                             model: models.Subject
-                        }
-                    },{
+                        }]
+                    }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
                     }]
