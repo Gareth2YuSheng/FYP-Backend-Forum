@@ -36,12 +36,12 @@ exports.appRoute = router => {
     //GET
     router.get("/question/:q_id/details", verifyFn.verifyToken, questionController.getForumQuestionDetails);
     router.get("/reply/:q_id?", verifyFn.verifyToken, replyController.getForumQuestionReplies);
-    router.get("/question/all", verifyFn.verifyToken, questionController.getForumQuestions);
+    router.get("/question/all", verifyFn.verifyToken, validationFn.validateGetForumQuestions, questionController.getForumQuestions);
 
     //POST
     router.post("/login", authController.login);
     router.post("/register", authController.register);
-    router.post("/question/create", upload.array("file", 5), verifyFn.verifyToken, validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
+    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 5), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, replyController.createForumReply);
     
     //PUT
@@ -52,7 +52,7 @@ exports.appRoute = router => {
     router.put("/reply/:r_id/downvote", verifyFn.verifyToken, replyController.downvoteForumReply);
 
     //DELETE
-    router.delete("/question/:q_id/delete", verifyFn.verifyToken, questionController.deleteForumQuestion);
+    router.delete("/question/:q_id/delete", verifyFn.verifyToken, validationFn.validateDeleteForumQuestion, questionController.deleteForumQuestion);
 
     //sanitization function
     router.use(validationFn.sanitizeResult); 

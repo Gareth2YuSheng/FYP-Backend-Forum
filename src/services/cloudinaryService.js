@@ -48,7 +48,7 @@ module.exports.uploadStreamToCloudinary = function(buffer) {
             },
             function(error, result) {
                 if (result) {
-                    logger.info(`Successfully uploaded post image: {questionId: ${result.url}}`);
+                    logger.info(`Successfully uploaded image: {image_url: ${result.url}}`);
                     let cloudinaryFileData = { url: result.url, publicId: result.public_id, status: 'success' };
                     res(cloudinaryFileData);
                 }
@@ -62,3 +62,24 @@ module.exports.uploadStreamToCloudinary = function(buffer) {
         }
     });
 } //End of uploadStreamToCloudinary
+
+module.exports.deleteImageFromCloudinary = function(publicId) {
+    logger.info("deleteImageFromCloudinary running");
+    return new Promise(function(res, rej) {
+        try {
+            //Delete file from cloudinary with the given publicId
+            cloudinary.uploader.destroy(publicId, function (error, result) {
+                if (result) {
+                    logger.info(`Successfully deleted image: {publicId: ${publicId}}`);                    
+                    res(result);
+                }
+                if (error) {
+                    rej(new CloudinaryError(error.msg));
+                }                
+            });
+        } catch (error) {
+            rej(new ApplicationError(error.message));
+        }
+    });
+} //End of deleteImageFromCloudinary
+

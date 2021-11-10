@@ -4,42 +4,42 @@
 class ApplicationError extends Error {
     constructor(message) {
         super(message);
-        Error.captureStackTrace(this, ApplicationError);
+        Error.captureStackTrace(this);
     }
 }
 
 class ValidationError extends ApplicationError {
     constructor(message) {
         super(message);
-        Error.captureStackTrace(this, ValidationError);
+        Error.captureStackTrace(this);
     }
 }
 
 class DatabaseError extends ApplicationError {
     constructor(message) {
         super(message);
-        Error.captureStackTrace(this, DatabaseError);
+        Error.captureStackTrace(this);
     }
 }
 
 class DatabaseConnectionError extends DatabaseError {
     constructor(message) {
         super(message);
-        Error.captureStackTrace(this, DatabaseConnectionError);
+        Error.captureStackTrace(this);
     }
 }
 
 class CloudinaryError extends ApplicationError {
     constructor(message) {
         super(message);
-        Error.captureStackTrace(this, CloudinaryError);
+        Error.captureStackTrace(this);
     }
 }
 
 class FileError extends ApplicationError {
     constructor(message) {
         super(message);
-        Error.captureStackTrace(this, FileError);
+        Error.captureStackTrace(this);
     }
 }
 

@@ -1,6 +1,7 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const cloudinaryService = require("./cloudinaryService");
+const fileService = require("../services/fileService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
@@ -19,19 +20,17 @@ exports.createPost = (title, content, objective, userId, topicId, files) => {
             });
             //upload files to cloudinary and store filedata in DB
             if (files) {
-                let fileUploadResult, cloudinaryResult;
+                let fileUploadResult, result;
                 for (let i=0; i<files.length; i++) {
-                    //files[i].originalname = `${post.postId}_${files[i].originalname}`;
                     //upload to cloudinary
                     fileUploadResult = await cloudinaryService.uploadStreamToCloudinary(files[i].buffer);
                     //save file data in DB
-                    cloudinaryResult = await models.File.create({
-                        cloudinaryFileId: fileUploadResult.publicId,
-                        cloudinaryUrl: fileUploadResult.url,
-                        fileName: files[i].originalname,
-                        mimeType: files[i].mimetype,
-                        parentId: post.postId
-                    });
+                    result = await fileService.createFile(
+                        fileUploadResult.publicId,
+                        fileUploadResult.url,
+                        files[i].originalname,
+                        files[i].mimetype,
+                        post.postId);
                 }
             }
             res(post);
@@ -62,9 +61,9 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            let result;
+            let posts;
             if (subject==="" && topic==="") { //if no subject or topic was provided
-                result = await models.Post.findAll({ 
+                posts = await models.Post.findAll({ 
                     limit: count, 
                     offset: offset, 
                     include: [{
@@ -83,7 +82,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                 if (subject!=="" && topic==="") whereOptions = { subjectId: subject }
                 else if (subject==="" && topic!=="") whereOptions = { topicId: topic }
                 else whereOptions = { topicId: topic, subjectId: subject }
-                result = await models.Post.findAll({ 
+                posts = await models.Post.findAll({ 
                     limit: count, 
                     offset: offset,
                     include: [{
@@ -99,7 +98,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     }]
                 });
             }        
-            res(result);
+            res(posts);
         } catch (error) {
             rej(new DatabaseError(error.message));
         }        
@@ -127,13 +126,25 @@ exports.editPost = (title, content, objective, topicId, post) => {
     });
 } //End of editPost
 
-exports.deletePost = (post) => {
+exports.deletePost = (postId) => {
     logger.info("deletePost running");
     //delete forum post instance provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await post.destroy();
-            res(result);
+            //delete the files in cloudinary, do not delete post first because file records will be deleted as well
+            const files = await fileService.getFilesForParent(postId);
+            let cloudinaryResult, result;
+            for (let f=0; f<files.length; f++) {
+                //delete the file from cloudinary
+                cloudinaryResult = await cloudinaryService.deleteImageFromCloudinary(files[f].cloudinaryFileId);
+                //delete the file records
+                result = await fileService.deleteFile(files[f].fileId);
+            }    
+            //delete post
+            result = await models.Post.destroy({
+                where: { postId: postId }
+            });     
+            res("Post Deleted Successfully.");
         } catch (error) {
             rej(new DatabaseError(error.message));
         }        

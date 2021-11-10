@@ -11,7 +11,7 @@ exports.register = async (req, res, next) => {
             "data": null,
             "message": null 
         });
-    } catch (error) {
+    } catch (error) { //change error handling to add database error check later
         next(new ApplicationError(error.message));
         //response to be standardised for each request
         return res.status(500).json({  

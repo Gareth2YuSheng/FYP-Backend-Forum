@@ -20,7 +20,8 @@ const validationFn = {
     validateCreateForumQuestion: function(req, res, next) {
         logger.info("validateCreateForumQuestion middleware called");
         let errorMsg = "";
-        
+        console.log("Body:")
+        console.log(req.body)
         //parse the data from formData
         req.body.questionData = JSON.parse(req.body.questionData);    
         req.body.topicData = JSON.parse(req.body.topicData);
@@ -30,13 +31,14 @@ const validationFn = {
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
-        // console.log(questionData);
-        // console.log(userData);
-        // console.log(topicData);
+        console.log(questionData);
+        console.log(userData);
+        console.log(topicData);
+        // console.log(req.body)
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(topicData)) {
-            errorMsg = "Missing questionData or missing userData";
+            errorMsg = "Missing questionData or missing userData or topicData";
         } else if (!questionData.questionTitle || !questionData.questionContent || !questionData.questionObjective) {
             errorMsg = "Missing data in questionData";
         } else if (!topicData.subjectId || !topicData.subjectName || !topicData.children) {
@@ -52,7 +54,7 @@ const validationFn = {
             res.status(500).json({  
                 "success": false,
                 "data": null,
-                "message": "Error!!" 
+                "message": errorMsg 
             });
         }
     }, //End of validateCreateForumQuestion
@@ -80,10 +82,58 @@ const validationFn = {
             res.status(500).json({  
                 "success": false,
                 "data": null,
-                "message": "Error!!" 
+                "message": errorMsg 
             });
         }
     }, //End of validateEditForumQuestion
+
+    validateGetForumQuestions: function(req, res, next) {
+        logger.info("validateGetForumQuestions middleware called");
+        let errorMsg = "";
+        const { count, page, subject, topic } = req.query;
+
+        //Null or empty check
+        if (count == null || count === "" || page == null || page === "") {
+            errorMsg = "Missing count or page number";
+        }
+        //Check for valid subjectId and topicId 
+        else if ((subject && !validateUUID(subject)) || (topic && !validateUUID(topic))) {
+            errorMsg = "Invalid subjectId or topicId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateGetForumQuestions Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateGetForumQuestions
+
+    validateDeleteForumQuestion: function(req, res, next) {
+        logger.info("validateDeleteForumQuestion middleware called");
+        let errorMsg = "";
+        const questionId = req.params.q_id;
+
+        //Check for valid questionId 
+        if (!validateUUID(questionId)) {
+            errorMsg = "Invalid questionId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateDeleteForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateDeleteForumQuestion
 
 
 

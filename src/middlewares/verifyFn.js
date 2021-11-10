@@ -12,8 +12,11 @@ const verifyFn = {
         res.type('json');
         if (!token || !token.includes("Bearer ")) {
             logger.error("", new ApplicationError("Unauthorized Access Attempt Was Made, No Token"));
-            res.status(403);
-            res.send(`{"Message":"Not Authorized"}`);
+            res.status(403).json({  
+                "success": false,
+                "data": null,
+                "message": "Not Authorized." 
+            });
         } else {
             //Do not validate token first, not our token
             next();
