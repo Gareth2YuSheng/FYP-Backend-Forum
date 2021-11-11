@@ -223,6 +223,36 @@ const validationFn = {
         }
     }, //End of validateMarkReplyAsAnswer
 
+    validateGetForumQuestionReplies: function(req, res, next) {
+        logger.info("validateGetForumQuestionReplies middleware called");
+        let errorMsg = "";
+        const questionId = req.params.q_id;
+        const { count, page } = req.query;
+
+        //Null or empty check
+        if (count == null || count === "" || page == null || page === "") {
+            errorMsg = "Missing count or page number";
+        }
+        //Check for valid questionId 
+        else if (!validateUUID(questionId)) {
+            errorMsg = "Invalid questionId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateGetForumQuestionReplies Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateGetForumQuestionReplies
+
+
+
+
 
     //sanitization function
     sanitizeResult: function (req, res, next){

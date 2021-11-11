@@ -33,48 +33,19 @@ exports.getReplyById = (replyId) => {
     });
 }   //End of getReplyById
 
-exports.getReplies = (count, page, content) => { //send user data as well
+exports.getReplies = (questionId, count, page) => { //send user data as well
     logger.info("getReplies running");
     const offset = (count*(page-1));
-    if (content == null) content = "";
+    //get replies for a post with the given postId
     return new Promise(async (res, rej) => {
         try {
-            let result;
-            if (post==="" && content==="") { //if no post or content was provided
-                result = await models.Post.findAll({ 
-                    limit: count, 
-                    include: [{
-                        attributes: ["content"],
-                        model: models.PostReply,
-                        include: {
-                            model: models.post
-                                }
-                            }, {
-                        attributes: ["firstName", "lastName", "profileImage"],
-                        model: models.User
-                    }]
-                });
-            } else {
-                whereOptions = {}
-                if (post!=="" && content==="") whereOptions = { postId: post }
-                if (content==="") whereOptions = { content: content }
-                else whereOptions = { postId: post, content: content }
-                result = await models.Post.findAll({ 
-                    limit: count,                
-                    include: [{
-                        attributes: ["content"],
-                        model: models.PostReply,
-                        where: whereOptions,
-                        include: {
-                            model: models.post
-                        }
-                    }, {
-                        attributes: ["firstName", "lastName", "profileImage"],
-                        model: models.User
-                    }]
-                });
-            }        
-            res(posts);
+            const replies = await models.PostReply.findAll({ 
+                limit: count,
+                offset: offset,
+                order: [ ["isAnswer", "DESC"] ],
+                where: { parentId: questionId }
+            });                  
+            res(replies);
         } catch (error) {
             rej(new DatabaseError(error.message));
         }        

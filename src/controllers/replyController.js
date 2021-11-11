@@ -7,11 +7,12 @@ const PostReply = require("../models/PostReply");
 
 exports.getForumQuestionReplies = async (req, res, next) => {
     logger.info("getForumQuestionReply running");
-    const { count, page, content } = req.query;
+    const questionId = req.params.q_id;
+    const { count, page } = req.query;    
     try { //sanitize results later
-        const results = await replyService.getReplies(count, page, content);
+        const results = await replyService.getReplies(questionId, count, page);
         if (results) {
-            logger.info(`Successfully retrieved posts: {count:${count}, page:${page}, content:${content}}`);
+            logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}}`);
             return res.status(200).json({  
                 "success": true,
                 "data": {
