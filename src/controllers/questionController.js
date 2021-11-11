@@ -27,7 +27,7 @@ exports.getForumQuestions = async (req, res, next) => {
         // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -52,8 +52,9 @@ exports.getForumQuestionDetails = async (req, res, next) => {
             "message": null 
         });
     } catch (error) {
+        //check if post exists
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -69,12 +70,7 @@ exports.createForumQuestion = async (req, res, next) => {
     const userData = req.body.userData; //remove later once login is setup
     const topicData = req.body.topicData;
     const files = req.files; //from multer
-    // console.log(req);
-    console.log("HI")
-    console.log(files);
-    // console.log(questionData);
-    // console.log(userData);
-    // console.log(topicData);
+    const base64Files = req.body.file; //from req body from frontend
     try {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register
@@ -88,7 +84,8 @@ exports.createForumQuestion = async (req, res, next) => {
             questionData.questionObjective,
             user.userId, //userId to later be retrieved from JWT token
             topic.topicId,
-            files);
+            files,
+            base64Files);
         if (results) {
             logger.info(`Successfully created post: {questionId: ${results.postId}}`);
             return res.status(200).json({  
@@ -165,16 +162,16 @@ exports.editForumQuestionDetails = async (req, res, next) => {
                 "message": "Question Updated Successfully." 
             });
         }
-        return res.status(200).json({  
-            "success": true,
-            "data": {
-                postId: "yes"
-            },
-            "message": "Question Updated Successfully." 
-        });
+        // return res.status(200).json({  
+        //     "success": true,
+        //     "data": {
+        //         postId: "yes"
+        //     },
+        //     "message": "Question Updated Successfully." 
+        // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -188,16 +185,31 @@ exports.deleteForumQuestion = async (req, res, next) => {
     logger.info("deleteForumQuestion running");
     const questionId = req.params.q_id;
     try {        
-        
+        //Check if post with questionId provided exists
+        const post = await postService.getPostById(questionId);
+        //If post does not exist return error
+        if (post == null) {
+            next(new ApplicationError(`Question does not exist: {questionId: ${questionId}}`));
+            return res.status(500).json({ 
+                "success": false,
+                "data": null,
+                "message": "Question does not exist." 
+            });
+        } 
+        //delete post with questionId
+        const results = await postService.deletePost(questionId);
+        if (results) {
+            logger.info(`Successfully deleted post: {questionId: ${questionId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": null,
+                "message": "Question Deleted Successfully." 
+            });
+        }
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,

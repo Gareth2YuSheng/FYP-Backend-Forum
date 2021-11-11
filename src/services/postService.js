@@ -1,10 +1,11 @@
-const { DatabaseError } = require("../errors/errors");
+const { DatabaseError, CloudinaryError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const cloudinaryService = require("./cloudinaryService");
+const fileService = require("../services/fileService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
-exports.createPost = (title, content, objective, userId, topicId, files) => {
+exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
     //create forumn post with the details provided
     return new Promise(async (res, rej) => {
@@ -18,25 +19,37 @@ exports.createPost = (title, content, objective, userId, topicId, files) => {
                 objective: objective
             });
             //upload files to cloudinary and store filedata in DB
-            if (files) {
-                let fileUploadResult, cloudinaryResult;
+            if (files.length > 0) { //from multer
+                let fileUploadResult, result;
                 for (let i=0; i<files.length; i++) {
-                    console.log(files[i])
-                    //files[i].originalname = `${post.postId}_${files[i].originalname}`;
                     //upload to cloudinary
                     fileUploadResult = await cloudinaryService.uploadStreamToCloudinary(files[i].buffer);
                     //save file data in DB
-                    cloudinaryResult = await models.File.create({
-                        cloudinaryFileId: fileUploadResult.publicId,
-                        cloudinaryUrl: fileUploadResult.url,
-                        fileName: files[i].originalname,
-                        mimeType: files[i].mimetype,
-                        parentId: post.postId
-                    });
+                    result = await fileService.createFile(
+                        fileUploadResult.publicId,
+                        fileUploadResult.url,
+                        files[i].originalname,
+                        files[i].mimetype,
+                        post.postId);
+                }
+            } else if (filesBase64.length > 0) { //from frontend
+                let fileUploadResult, result;
+                for (let i=0; i<filesBase64.length; i++) {
+                    console.log(filesBase64[i]);
+                    //upload to cloudinary as base64 encoded string
+                    fileUploadResult = await cloudinaryService.uploadFileToCloudinary(filesBase64[i].uri);  
+                    //save file data in DB
+                    result = await fileService.createFile(
+                        fileUploadResult.publicId,
+                        fileUploadResult.url,
+                        filesBase64[i].name,
+                        filesBase64[i].type,
+                        post.postId);
                 }
             }
             res(post);
         } catch (error) {
+            console.log(error)
             rej(new DatabaseError(error.message));
         }        
     });
@@ -63,18 +76,25 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            let result;
+            let posts;
             if (subject==="" && topic==="") { //if no subject or topic was provided
-                result = await models.Post.findAll({ 
+                posts = await models.Post.findAll({ 
                     limit: count, 
                     offset: offset, 
+                    order: [
+                        ['createdAt', 'DESC']
+                    ],
                     include: [{
-                        attributes: ["topicName"],
-                        model: models.Topic,
-                        include: {
+                        attributes: ["cloudinaryUrl"],
+                        model: models.File
+                    }, {
+                        attributes: ["topicName", "subjectId"],
+                        model: models.Topic,               
+                        include: [{
+                            attributes: ["subjectName"],
                             model: models.Subject
-                        }
-                    },{
+                        }]
+                    }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
                     }]
@@ -84,23 +104,32 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                 if (subject!=="" && topic==="") whereOptions = { subjectId: subject }
                 else if (subject==="" && topic!=="") whereOptions = { topicId: topic }
                 else whereOptions = { topicId: topic, subjectId: subject }
-                result = await models.Post.findAll({ 
+                posts = await models.Post.findAll({ 
                     limit: count, 
-                    offset: offset,
-                    include: [{
-                        attributes: ["topicName"],
-                        model: models.Topic,
-                        where: whereOptions,
-                        include: {
+                    offset: offset,  
+                    order: [
+                        ['createdAt', 'DESC']
+                    ],               
+                    include: [
+                    {
+                        attributes: ["cloudinaryUrl"],
+                        model: models.File
+                    },
+                    {
+                        attributes: ["topicName", "subjectId"],
+                        model: models.Topic,      
+                        where: whereOptions,                  
+                        include: [{
+                            attributes: ["subjectName"],
                             model: models.Subject
-                        }
-                    },{
+                        }]
+                    }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
                     }]
                 });
             }        
-            res(result);
+            res(posts);
         } catch (error) {
             rej(new DatabaseError(error.message));
         }        
@@ -128,13 +157,25 @@ exports.editPost = (title, content, objective, topicId, post) => {
     });
 } //End of editPost
 
-exports.deletePost = (post) => {
+exports.deletePost = (postId) => {
     logger.info("deletePost running");
     //delete forum post instance provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await post.destroy();
-            res(result);
+            //delete the files in cloudinary, do not delete post first because file records will be deleted as well
+            const files = await fileService.getFilesForParent(postId);
+            let cloudinaryResult, result;
+            for (let f=0; f<files.length; f++) {
+                //delete the file from cloudinary
+                cloudinaryResult = await cloudinaryService.deleteImageFromCloudinary(files[f].cloudinaryFileId);
+                //delete the file records
+                result = await fileService.deleteFile(files[f].fileId);
+            }    
+            //delete post
+            result = await models.Post.destroy({
+                where: { postId: postId }
+            });     
+            res("Post Deleted Successfully.");
         } catch (error) {
             rej(new DatabaseError(error.message));
         }        
