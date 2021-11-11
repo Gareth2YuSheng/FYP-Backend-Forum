@@ -131,7 +131,41 @@ const validationFn = {
         }
     }, //End of validateDeleteForumQuestion
 
-
+    validateMarkReplyAsAnswer: function(req, res, next) {
+        logger.info("validateMarkReplyAsAnswer middleware called");
+        let errorMsg = "";
+        const replyId = req.params.r_id;
+        const replyData = req.body.replyData;
+        const userData = req.body.userData;
+        //convert isAnswer to lower case
+        replyData.isAnswer = replyData.isAnswer.toLowerCase();
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(replyData)) {
+            errorMsg = "Missing userData or replyData";
+        }
+        //Check for valid replyId
+        else if (!validateUUID(replyId)) {
+            errorMsg = "Invalid replyId";
+        } 
+        //Check if userData contains userId and replyData contains isAnswer
+        else if (userData.userId == (userData) && replyData.isAnswer == (replyData)){
+            errorMsg = "Missing userId or isAnswer"
+        }
+        //Check if replyData is valid
+        else if (replyData.isAnswer !== "true" && replyData.isAnswer !== "false") {
+            errorMsg = "Invalid replyData";
+        }
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateMarkReplyAsAnswer Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateMarkReplyAsAnswer
 
 
     //sanitization function

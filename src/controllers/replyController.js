@@ -181,9 +181,10 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
     try {        
         //Make sure there is a user with the userId before making answer as correct
         const user = await userService.getIfNotCreateUser(userData);
-        //CHeck if reply with replyId provided exists
+        // Check if reply with replyId provided exists
         const reply = await replyService.getReplyById(replyId);
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
+        //Check if post with questionId exist
+        const post = await postService.getPostById(reply.parentId);
         //If reply does not exist return error
         if (reply == null) {
             next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
@@ -193,9 +194,9 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
                 "message": "Reply does not exist."
             });
         }
-        // Check if user is author of the postReply
-        if (userData.userId != reply.userId) {
-            next(new ApplicationError(`Unauthorized Reply Edit Attempt: Unauthorized Reply Edit by {userId: ${userData.userId}} on {replyId: ${reply.replyId}}`));
+        // Check if user is author of the post
+        if (userData.userId != post.userId) {
+            next(new ApplicationError(`Unauthorized Edit Attempt: Unauthorized Mark Answer Reply Edit by {userId: ${userData.userId}} on {postId: ${questionId.questionId}}`));
             return res.status(500).json({ 
                 "success": false,
                 "data": null,
@@ -203,10 +204,8 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
             });
         }
         //Update reply answer as correct
-        const results = await replyService.markForumReplyAsCorrectAnswer(
-            replyData.isAnswer,
-            user.userId,
-            reply);
+        replyData.isAnswer = (replyData.isAnswer === "true") ? true : false;
+        const results = await replyService.markForumReplyAsCorrectAnswer(replyData.isAnswer, reply);
         if (results) {
             logger.info(`Successfully updated reply answer as correct: ${results.replyId}`);
             return res.status(200).json({
@@ -214,7 +213,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
                 "data": {
                     replyId: results.replyId
                 },
-                "message": "Reply Marked as Correct Successfully"
+                "message": "Reply Marked Updated Successfully"
             });
         }
     } catch (error) {

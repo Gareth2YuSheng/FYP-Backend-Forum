@@ -47,7 +47,7 @@ exports.appRoute = router => {
     //PUT
     router.put("/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);
     router.put("/reply/:r_id/edit", verifyFn.verifyToken, replyController.editForumReply);
-    router.put("/reply/:r_id/correct", verifyFn.verifyToken, replyController.markForumReplyAsCorrectAnswer);
+    router.put("/reply/:r_id/correct", verifyFn.verifyToken, validationFn.validateMarkReplyAsAnswer, replyController.markForumReplyAsCorrectAnswer);
     router.put("/reply/:r_id/upvote", verifyFn.verifyToken, replyController.upvoteForumReply);
     router.put("/reply/:r_id/downvote", verifyFn.verifyToken, replyController.downvoteForumReply);
 

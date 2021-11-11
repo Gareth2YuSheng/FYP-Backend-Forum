@@ -21,7 +21,7 @@ exports.createReply = (content, userId, parentId) => {
 } //End of createReply
 
 exports.getReplyById = (replyId) => {
-    logger.info("getReplyById");
+    logger.info("getReplyById running");
     //get forum post reply with the replyId provided
     return new Promise(async (res, rej) => {
         try {
@@ -100,7 +100,7 @@ exports.editForumReply = (content, userId, reply) => {
     });
 } //End of editReply
 
-exports.markForumReplyAsCorrectAnswer = (isAnswer, userId, reply) => {
+exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
     logger.info("markForumReplyAsCorrectAnswer running");
     //update forum post reply instance with the details provided
     return new Promise(async (res, rej) => {
@@ -108,7 +108,6 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, userId, reply) => {
             //update the fields in the post instance
             reply.set({
                 isAnswer: isAnswer,
-                userId: userId,
             });
             //save the changes to the DB
             const result = await reply.save();
@@ -117,4 +116,4 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, userId, reply) => {
             rej( new DatabaseError(error.message));
         }
     });
-} //End of editReply
+} //End of markForumReplyAsCorrectAnswer
