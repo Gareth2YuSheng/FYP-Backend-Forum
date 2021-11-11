@@ -131,6 +131,62 @@ const validationFn = {
         }
     }, //End of validateDeleteForumQuestion
 
+    validateCreateForumReply: function(req, res, next) {
+        logger.info("validateCreateForumReply middleware called");
+        let errorMsg = "";
+        const replyData = req.body.replyData;
+        const userData = req.body.userData; //remove later once login is setup
+
+        //Null or empty check
+        if (!objValidateEmptyOrNull(replyData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing replyData or userData";
+        } else if (!replyData.replyContent) {
+            errorMsg = "Missing data in replyData";
+        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+            errorMsg = "Missing data in userData";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateCreateForumReply Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateCreateForumReply
+
+    validateEditForumReply: function(req, res, next) {
+        logger.info("validateEditForumReply middleware called");
+        let errorMsg = "";
+        const replyId = req.params.r_id;
+        const replyData = req.body.replyData;
+        const userData = req.body.userData; //remove later once login is setup
+
+        //Null or empty check
+        if (!objValidateEmptyOrNull(replyData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing replyData or userData";
+        } else if (!replyData.replyContent) {
+            errorMsg = "Missing data in replyData";
+        //Check for valid replyId 
+        } else if (!validateUUID(replyId)) {
+            errorMsg = "Invalid replyId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateEditForumReply Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateEditForumReply
+
     validateMarkReplyAsAnswer: function(req, res, next) {
         logger.info("validateMarkReplyAsAnswer middleware called");
         let errorMsg = "";
