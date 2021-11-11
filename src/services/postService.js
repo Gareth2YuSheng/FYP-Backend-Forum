@@ -81,6 +81,9 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                 posts = await models.Post.findAll({ 
                     limit: count, 
                     offset: offset, 
+                    order: [
+                        ['createdAt', 'DESC']
+                    ],
                     include: [{
                         attributes: ["cloudinaryUrl"],
                         model: models.File
@@ -103,7 +106,10 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                 else whereOptions = { topicId: topic, subjectId: subject }
                 posts = await models.Post.findAll({ 
                     limit: count, 
-                    offset: offset,                 
+                    offset: offset,  
+                    order: [
+                        ['createdAt', 'DESC']
+                    ],               
                     include: [
                     {
                         attributes: ["cloudinaryUrl"],
