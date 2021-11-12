@@ -250,8 +250,8 @@ const validationFn = {
         }
     }, //End of validateGetForumQuestionReplies
 
-    validateUpvoteForumReply: function(req, res, next) {
-        logger.info("validateUpvoteForumReply middleware called");
+    validateVoteForumReply: function(req, res, next) {
+        logger.info("validateVoteForumReply middleware called");
         let errorMsg = "";
         const replyId = req.params.r_id;
         const userData = req.body.userData;
@@ -271,44 +271,14 @@ const validationFn = {
         if (errorMsg === "") { //if no error message move on
             next();
         } else {
-            logger.error("", new ValidationError("validateUpvoteForumReply Failed: " + errorMsg));
+            logger.error("", new ValidationError("validateVoteForumReply Failed: " + errorMsg));
             res.status(500).json({  
                 "success": false,
                 "data": null,
                 "message": errorMsg 
             });
         }
-    }, //End of validateUpvoteForumReply
-
-    validateDownvoteForumReply: function(req, res, next) {
-        logger.info("validateDownvoteForumReply middleware called");
-        let errorMsg = "";
-        const replyId = req.params.r_id;
-        const userData = req.body.userData;
-        
-        //Null or empty check
-        if (!objValidateEmptyOrNull(userData)) {
-            errorMsg = "Missing userData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
-            errorMsg = "Missing data in userData";
-        }
-
-        //Check for valid replyId
-        else if (!validateUUID(replyId)) {
-            errorMsg = "Invalid replyId";
-        } 
-
-        if (errorMsg === "") { //if no error message move on
-            next();
-        } else {
-            logger.error("", new ValidationError("validateDownvoteForumReply Failed: " + errorMsg));
-            res.status(500).json({  
-                "success": false,
-                "data": null,
-                "message": errorMsg 
-            });
-        }
-    }, //End of validateDownvoteForumReply
+    }, //End of validateVoteForumReply
 
     //sanitization function
     sanitizeResult: function (req, res, next){
