@@ -204,7 +204,7 @@ const validationFn = {
             errorMsg = "Invalid replyId";
         } 
         //Check if userData contains userId and replyData contains isAnswer
-        else if (userData.userId == (userData) && replyData.isAnswer == (replyData)){
+        else if (!userData.userId && replyData.isAnswer != null){
             errorMsg = "Missing userId or isAnswer"
         }
         //Check if replyData is valid

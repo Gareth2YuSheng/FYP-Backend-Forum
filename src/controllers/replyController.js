@@ -102,9 +102,10 @@ exports.upvoteForumReply = async (req, res, next) => {
             });
         }
         //Create vote record and update reply voteCount
-        const results = await replyService.upvoteForumReply(
+        const results = await replyService.voteForumReply(
             user.userId,
-            reply.replyId);
+            reply.replyId,
+            true);
         if (results) {
             logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${reply.replyId}}`);
             return res.status(200).json({  
@@ -146,9 +147,10 @@ exports.downvoteForumReply = async (req, res, next) => {
             });
         }
         //Create vote record and update reply voteCount
-        const results = await replyService.downvoteForumReply(
+        const results = await replyService.voteForumReply(
             user.userId,
-            reply.replyId);
+            reply.replyId,
+            false);
         if (results) {
             logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${reply.replyId}}`);
             return res.status(200).json({  
@@ -233,7 +235,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
     const userData = req.body.userData;
     try {        
         //Make sure there is a user with the userId before making answer as correct
-        const user = await userService.getIfNotCreateUser(userData);
+        //const user = await userService.getIfNotCreateUser(userData);
         // Check if reply with replyId provided exists
         const reply = await replyService.getReplyById(replyId);
         //Check if post with questionId exist

@@ -90,41 +90,24 @@ exports.editForumReply = (content, userId, reply) => {
     });
 } //End of editReply
 
-exports.upvoteForumReply = (userId, parentId) => {
-    logger.info("upvoteForumReply running");
-    //update forum post reply voteCount positively, and create vote record in DB
-    return new Promise(async (res, rej) => {
-        try{
-            const result = await models.Vote.create({
-                type: true,
-                userId: userId,
-                parentId: parentId
-            });
-            const upvoteResult = await models.PostReply.increment({voteCount: 1}, { where: { replyId: parentId } });
-            res(result);
-        } catch (error) {
-            rej( new DatabaseError(error.message));
-        }
-    })
-} //End of upvoteForumReply
-
-exports.downvoteForumReply = (userId, parentId) => {
-    logger.info("downvoteForumReply running");
+exports.voteForumReply = (userId, parentId, type) => {
+    logger.info("voteForumReply running");
     //update forum post reply voteCount negatively, and create vote record in DB
     return new Promise(async (res, rej) => {
         try{
             const result = await models.Vote.create({
-                type: false,
+                type: type,
                 userId: userId,
                 parentId: parentId
             });
-            const downvoteResult = await models.PostReply.increment({voteCount: -1}, { where: { replyId: parentId } });
+            const increment = (type) ? 1 : -1;
+            const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: parentId } });
             res(result);
         } catch (error) {
             rej( new DatabaseError(error.message));
         }
     })
-} //End of upvoteForumReply
+} //End of voteForumReply
 
 exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
     logger.info("markForumReplyAsCorrectAnswer running");
