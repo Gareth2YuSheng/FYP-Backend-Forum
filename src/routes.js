@@ -48,8 +48,8 @@ exports.appRoute = router => {
     router.put("/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);
     router.put("/reply/:r_id/edit", verifyFn.verifyToken, validationFn.validateEditForumReply, replyController.editForumReply);
     router.put("/reply/:r_id/correct", verifyFn.verifyToken, validationFn.validateMarkReplyAsAnswer, replyController.markForumReplyAsCorrectAnswer);
-    router.put("/reply/:r_id/upvote", verifyFn.verifyToken, replyController.upvoteForumReply);
-    router.put("/reply/:r_id/downvote", verifyFn.verifyToken, replyController.downvoteForumReply);
+    router.put("/reply/:r_id/upvote", verifyFn.verifyToken, validationFn.validateUpvoteForumReply, replyController.upvoteForumReply);
+    router.put("/reply/:r_id/downvote", verifyFn.verifyToken, validationFn.validateDownvoteForumReply, replyController.downvoteForumReply);
 
     //DELETE
     router.delete("/question/:q_id/delete", verifyFn.verifyToken, validationFn.validateDeleteForumQuestion, questionController.deleteForumQuestion);

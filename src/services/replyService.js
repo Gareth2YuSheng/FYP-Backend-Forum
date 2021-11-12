@@ -90,6 +90,42 @@ exports.editForumReply = (content, userId, reply) => {
     });
 } //End of editReply
 
+exports.upvoteForumReply = (userId, parentId) => {
+    logger.info("upvoteForumReply running");
+    //update forum post reply voteCount positively, and create vote record in DB
+    return new Promise(async (res, rej) => {
+        try{
+            const result = await models.Vote.create({
+                type: true,
+                userId: userId,
+                parentId: parentId
+            });
+            const upvoteResult = await models.PostReply.increment({voteCount: 1}, { where: { replyId: parentId } });
+            res(result);
+        } catch (error) {
+            rej( new DatabaseError(error.message));
+        }
+    })
+} //End of upvoteForumReply
+
+exports.downvoteForumReply = (userId, parentId) => {
+    logger.info("downvoteForumReply running");
+    //update forum post reply voteCount negatively, and create vote record in DB
+    return new Promise(async (res, rej) => {
+        try{
+            const result = await models.Vote.create({
+                type: false,
+                userId: userId,
+                parentId: parentId
+            });
+            const downvoteResult = await models.PostReply.increment({voteCount: -1}, { where: { replyId: parentId } });
+            res(result);
+        } catch (error) {
+            rej( new DatabaseError(error.message));
+        }
+    })
+} //End of upvoteForumReply
+
 exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
     logger.info("markForumReplyAsCorrectAnswer running");
     //update forum post reply instance with the details provided
@@ -97,7 +133,7 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
         try {
             //update the fields in the post instance
             reply.set({
-                isAnswer: isAnswer,
+                isAnswer: isAnswer
             });
             //save the changes to the DB
             const result = await reply.save();

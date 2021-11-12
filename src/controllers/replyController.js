@@ -86,14 +86,35 @@ exports.createForumReply = async (req, res, next) => {
 exports.upvoteForumReply = async (req, res, next) => {
     logger.info("upvoteForumReply running");
     const replyId = req.params.r_id;
+    const userData = req.body.userData;
     try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+        //Make sure there is a user with the userId before upvoting reply
+        const user = await userService.getIfNotCreateUser(userData);
+        //Check if reply with replyId provided exists
+        const reply = await replyService.getReplyById(replyId); //check if need to include this line
+        //If reply does not exist return error
+        if (reply == null) {
+            next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
+            return res.status(500).json({
+                "success": false,
+                "data": null,
+                "message": "Reply does not exist."
+            });
+        }
+        //Create vote record and update reply voteCount
+        const results = await replyService.upvoteForumReply(
+            user.userId,
+            reply.replyId);
+        if (results) {
+            logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${reply.replyId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    voteId: results.voteId
+                },
+                "message": "Vote Created Successfully."
+            });
+        }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
@@ -109,14 +130,35 @@ exports.upvoteForumReply = async (req, res, next) => {
 exports.downvoteForumReply = async (req, res, next) => {
     logger.info("downvoteForumReply running");
     const replyId = req.params.r_id;
-    try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+    const userData = req.body.userData;
+    try {
+        //Make sure there is a user with the userId before upvoting reply
+        const user = await userService.getIfNotCreateUser(userData);
+        //Check if reply with replyId provided exists
+        const reply = await replyService.getReplyById(replyId); //check if need to include this line
+        //If reply does not exist return error
+        if (reply == null) {
+            next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
+            return res.status(500).json({
+                "success": false,
+                "data": null,
+                "message": "Reply does not exist."
+            });
+        }
+        //Create vote record and update reply voteCount
+        const results = await replyService.downvoteForumReply(
+            user.userId,
+            reply.replyId);
+        if (results) {
+            logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${reply.replyId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    voteId: results.voteId
+                },
+                "message": "Vote Created Successfully."
+            });
+        }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
@@ -162,7 +204,6 @@ exports.editForumReply = async (req, res, next) => {
             replyData.replyContent,
             user.userId,
             reply);
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         if (results) {
             logger.info(`Successfully updated reply: {replyId: ${results.replyId}}`);
             return res.status(200).json({  
