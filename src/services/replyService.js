@@ -52,6 +52,21 @@ exports.getReplies = (questionId, count, page) => { //send user data as well
     });
 } //End of getReplies
 
+exports.getReplyCountForQuestion = (questionId) => { //send user data as well
+    logger.info("getReplyCountForQuestion running");
+    //get replies for a post with the given postId
+    return new Promise(async (res, rej) => {
+        try {
+            const replyCount = await models.PostReply.count({ 
+                where: { parentId: questionId }
+            });                  
+            res(replyCount);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getReplyCountForQuestion
+
 exports.editForumReply = (content, userId, reply) => {
     logger.info("editReply running");
     //update forum post reply instance with the details provided

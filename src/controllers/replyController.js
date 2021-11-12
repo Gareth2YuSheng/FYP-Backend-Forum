@@ -10,17 +10,22 @@ exports.getForumQuestionReplies = async (req, res, next) => {
     const questionId = req.params.q_id;
     const { count, page } = req.query;    
     try { //sanitize results later
-        const results = await replyService.getReplies(questionId, count, page);
-        if (results) {
-            logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}}`);
-            return res.status(200).json({  
-                "success": true,
-                "data": {
-                    replies: results
-                    },
-                "message": null 
-            });
-        }
+        const replyCount = await replyService.getReplyCountForQuestion(questionId);
+        let replies;
+        if (replyCount > 0) {
+            replies = await replyService.getReplies(questionId, count, page);
+        } 
+        //return response regardless of if there are replies or not
+        logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}} with {replyCount: ${replyCount}}`);
+        return res.status(200).json({  
+            "success": true,
+            "data": {
+                replyCount: replyCount,
+                replies: replies
+                },
+            "message": null 
+        });
+        
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error)
