@@ -25,7 +25,7 @@ const validationFn = {
         req.body.topicData = JSON.parse(req.body.topicData);
         req.body.userData = JSON.parse(req.body.userData);
         if (req.body.file) {
-            req.body.file = JSON.parse(req.body.file)
+            req.body.file = JSON.parse(req.body.file);
         }
 
         const questionData = req.body.questionData;    
