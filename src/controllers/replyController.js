@@ -28,7 +28,7 @@ exports.getForumQuestionReplies = async (req, res, next) => {
         
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -66,13 +66,19 @@ exports.createForumReply = async (req, res, next) => {
             });
         }
     } catch (error) {
+        let errMsg = "Server is unable to process the request.";
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else {
+            if (error.message === "insert or update on table \"postReply\" violates foreign key constraint \"postReply_parentId_fkey\"") {
+                errMsg = "Post does not exist.";
+            }
+            next(error);
+        } 
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": "Server is unable to process the request." 
+            "message": errMsg 
         });
     }
 }; //End of createForumReply
@@ -90,7 +96,7 @@ exports.upvoteForumReply = async (req, res, next) => {
         });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -113,7 +119,7 @@ exports.downvoteForumReply = async (req, res, next) => {
         });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -169,7 +175,7 @@ exports.editForumReply = async (req, res, next) => {
         }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -224,7 +230,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
         }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
