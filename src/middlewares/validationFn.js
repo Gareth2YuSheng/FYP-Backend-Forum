@@ -137,6 +137,8 @@ const validationFn = {
         const replyData = req.body.replyData;
         const userData = req.body.userData; //remove later once login is setup
 
+        console.log(userData)
+
         //Null or empty check
         if (!objValidateEmptyOrNull(replyData) || !objValidateEmptyOrNull(userData)) {
             errorMsg = "Missing replyData or userData";
