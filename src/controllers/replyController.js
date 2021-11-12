@@ -7,22 +7,28 @@ const PostReply = require("../models/PostReply");
 
 exports.getForumQuestionReplies = async (req, res, next) => {
     logger.info("getForumQuestionReply running");
-    const { count, page, content } = req.query;
+    const questionId = req.params.q_id;
+    const { count, page } = req.query;    
     try { //sanitize results later
-        const results = await replyService.getReplies(count, page, content);
-        if (results) {
-            logger.info(`Successfully retrieved posts: {count:${count}, page:${page}, content:${content}}`);
-            return res.status(200).json({  
-                "success": true,
-                "data": {
-                    replies: results
-                    },
-                "message": null 
-            });
-        }
+        const replyCount = await replyService.getReplyCountForQuestion(questionId);
+        let replies;
+        if (replyCount > 0) {
+            replies = await replyService.getReplies(questionId, count, page);
+        } 
+        //return response regardless of if there are replies or not
+        logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}} with {replyCount: ${replyCount}}`);
+        return res.status(200).json({  
+            "success": true,
+            "data": {
+                replyCount: replyCount,
+                replies: replies
+                },
+            "message": null 
+        });
+        
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -60,13 +66,19 @@ exports.createForumReply = async (req, res, next) => {
             });
         }
     } catch (error) {
+        let errMsg = "Server is unable to process the request.";
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else {
+            if (error.message === "insert or update on table \"postReply\" violates foreign key constraint \"postReply_parentId_fkey\"") {
+                errMsg = "Post does not exist.";
+            }
+            next(error);
+        } 
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": "Server is unable to process the request." 
+            "message": errMsg 
         });
     }
 }; //End of createForumReply
@@ -84,7 +96,7 @@ exports.upvoteForumReply = async (req, res, next) => {
         });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -107,7 +119,7 @@ exports.downvoteForumReply = async (req, res, next) => {
         });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -163,7 +175,7 @@ exports.editForumReply = async (req, res, next) => {
         }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
@@ -218,7 +230,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
         }
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error)
+        else next(error);
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,

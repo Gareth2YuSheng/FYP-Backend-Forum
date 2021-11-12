@@ -35,7 +35,6 @@ exports.createPost = (title, content, objective, userId, topicId, files, filesBa
             } else if (filesBase64.length > 0) { //from frontend
                 let fileUploadResult, result;
                 for (let i=0; i<filesBase64.length; i++) {
-                    console.log(filesBase64[i]);
                     //upload to cloudinary as base64 encoded string
                     fileUploadResult = await cloudinaryService.uploadFileToCloudinary(filesBase64[i].uri);  
                     //save file data in DB
