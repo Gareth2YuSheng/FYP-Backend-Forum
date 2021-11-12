@@ -43,7 +43,11 @@ exports.getReplies = (questionId, count, page) => { //send user data as well
                 limit: count,
                 offset: offset,
                 order: [ ["isAnswer", "DESC"] ],
-                where: { parentId: questionId }
+                where: { parentId: questionId },
+                include: [{
+                    attributes: ["firstName", "lastName", "profileImage"],
+                    model: models.User
+                }]
             });                  
             res(replies);
         } catch (error) {
