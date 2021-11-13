@@ -42,7 +42,10 @@ exports.getReplies = (questionId, count, page) => { //send user data as well
             const replies = await models.PostReply.findAll({ 
                 limit: count,
                 offset: offset,
-                order: [ ["isAnswer", "DESC"] ],
+                order: [ 
+                    ["isAnswer", "DESC"],
+                    ["voteCount", "DESC"]
+                ],
                 where: { parentId: questionId },
                 include: [{
                     attributes: ["firstName", "lastName", "profileImage"],
@@ -85,14 +88,14 @@ exports.editForumReply = (content, userId, reply) => {
             const result = await reply.save();
             res(result);
         } catch (error) {
-            rej( new DatabaseError(error.message));
+            rej(new DatabaseError(error.message));
         }
     });
 } //End of editReply
 
 exports.voteForumReply = (userId, parentId, type) => {
     logger.info("voteForumReply running");
-    //update forum post reply voteCount negatively, and create vote record in DB
+    //update forum post reply voteCount, and create vote record in DB
     return new Promise(async (res, rej) => {
         try{
             const result = await models.Vote.create({
@@ -104,10 +107,70 @@ exports.voteForumReply = (userId, parentId, type) => {
             const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: parentId } });
             res(result);
         } catch (error) {
-            rej( new DatabaseError(error.message));
+            rej(new DatabaseError(error.message));
         }
     })
 } //End of voteForumReply
+
+exports.checkForVote = (userId, parentId) => {
+    logger.info("checkForVote running");
+    //check if user has already voted for forum post reply  
+    return new Promise(async (res, rej) => {
+        try{
+            const result = await models.Vote.findOne({
+                where: { 
+                    parentId: parentId,
+                    userId: userId
+                }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of checkForVote
+
+exports.changeVoteType = (vote, type) => { 
+    logger.info("changeVoteType running");
+    //update vote type given by user
+    return new Promise(async (res, rej) => {
+        try{
+            //update the fields in the vote instance
+            vote.set({
+                type: type
+            });
+            const result = await vote.save();
+            const increment = (type) ? 2 : -2; //increment 2 as this is changing vote type not adding a vote
+            const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: vote.parentId } });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of changeVoteType
+
+exports.unvoteForumReply = (vote, replyId) => {
+    logger.info("unvoteForumReply running");
+    //delete user's vote for a forum post reply 
+    return new Promise(async (res, rej) => {
+        try{
+            const increment = (vote.type) ? 1 : -1;
+            // const result = await models.Vote.destroy({
+            //     where: { 
+            //         parentId: parentId,
+            //         userId: userId
+            //     }
+            // });
+            const result = await vote.destroy();
+            //minus vote value from reply vote count
+            const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: replyId } });
+            console.log(result)
+            res("Vote deleted successfully");
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of unvoteForumReply
 
 exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
     logger.info("markForumReplyAsCorrectAnswer running");
@@ -122,7 +185,7 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
             const result = await reply.save();
             res(result);
         } catch (error) {
-            rej( new DatabaseError(error.message));
+            rej(new DatabaseError(error.message));
         }
     });
 } //End of markForumReplyAsCorrectAnswer

@@ -207,7 +207,7 @@ const validationFn = {
         else if (!userData.userId && replyData.isAnswer != null){
             errorMsg = "Missing userId or isAnswer"
         }
-        //Check if replyData is valid
+        //Check if replyData.isAnswer is valid
         else if (replyData.isAnswer !== "true" && replyData.isAnswer !== "false") {
             errorMsg = "Invalid replyData";
         }
@@ -255,18 +255,29 @@ const validationFn = {
         let errorMsg = "";
         const replyId = req.params.r_id;
         const userData = req.body.userData;
+        const voteData = req.body.voteData;
         
         //Null or empty check
-        if (!objValidateEmptyOrNull(userData)) {
-            errorMsg = "Missing userData";
+        if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(voteData)) {
+            errorMsg = "Missing userData or voteData";
         } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
-        }
-
+        } 
         //Check for valid replyId
         else if (!validateUUID(replyId)) {
             errorMsg = "Invalid replyId";
-        } 
+        }
+        //check if vote type is missing
+        if (!voteData.type) {
+            errorMsg = "Missing data in voteData";
+        } else {
+            //convert vote type to lowercase
+            voteData.type = voteData.type.toLowerCase();
+        }
+        //check for valid vote type
+        if (voteData.type !== "up" && voteData.type !== "down") {
+            errorMsg = "Invalid vote type";
+        }
 
         if (errorMsg === "") { //if no error message move on
             next();
@@ -279,6 +290,35 @@ const validationFn = {
             });
         }
     }, //End of validateVoteForumReply
+
+    validateDeleteVoteForumReply: function(req, res, next) {
+        logger.info("validateDeleteVoteForumReply middleware called");
+        let errorMsg = "";
+        const replyId = req.params.r_id;
+        const userData = req.body.userData;
+        
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing userData or voteData";
+        } else if (!userData.userId) {
+            errorMsg = "Missing data in userData";
+        } 
+        //Check for valid replyId
+        else if (!validateUUID(replyId)) {
+            errorMsg = "Invalid replyId";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateDeleteVoteForumReply Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateDeleteVoteForumReply
 
     //sanitization function
     sanitizeResult: function (req, res, next){
