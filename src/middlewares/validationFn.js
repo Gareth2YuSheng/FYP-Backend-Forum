@@ -10,6 +10,7 @@ function objValidateEmptyOrNull(object) { //if Valid return true, Invalid return
 }
 
 function validateUUID(uuid) {
+    if (uuid == null || uuid === "") return false;
     const reUuid = new RegExp(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$`);
     return reUuid.test(uuid);
 }
@@ -227,15 +228,15 @@ const validationFn = {
         logger.info("validateGetForumQuestionReplies middleware called");
         let errorMsg = "";
         const questionId = req.params.q_id;
-        const { count, page } = req.query;
+        const { count, page, userId } = req.query;
 
         //Null or empty check
-        if (count == null || count === "" || page == null || page === "") {
-            errorMsg = "Missing count or page number";
+        if (count == null || count === "" || page == null || page === "" || userId == null || userId === "") {
+            errorMsg = "Missing count or page number or userId";
         }
         //Check for valid questionId 
-        else if (!validateUUID(questionId)) {
-            errorMsg = "Invalid questionId";
+        else if (!validateUUID(questionId) || !validateUUID(userId)) {
+            errorMsg = "Invalid questionId or userId";
         }
 
         if (errorMsg === "") {
