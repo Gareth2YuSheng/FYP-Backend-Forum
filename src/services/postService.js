@@ -81,7 +81,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset, 
                     order: [
-                        ['createdAt', 'DESC']
+                        ["createdAt", "DESC"]
                     ],
                     include: [{
                         attributes: ["cloudinaryUrl"],
@@ -107,7 +107,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset,  
                     order: [
-                        ['createdAt', 'DESC']
+                        ["createdAt", "DESC"]
                     ],               
                     include: [
                     {
