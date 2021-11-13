@@ -83,40 +83,115 @@ exports.createForumReply = async (req, res, next) => {
     }
 }; //End of createForumReply
 
-exports.upvoteForumReply = async (req, res, next) => {
-    logger.info("upvoteForumReply running");
+exports.voteForumReply = async (req, res, next) => {
+    logger.info("voteForumReply running");
     const replyId = req.params.r_id;
+    const userData = req.body.userData;
+    const voteData = req.body.voteData;
+    voteData.type = voteData.type === "up";
     try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+        //Make sure there is a user with the userId before upvoting reply
+        const user = await userService.getIfNotCreateUser(userData);
+        // //Check if reply with replyId provided exists
+        // const reply = await replyService.getReplyById(replyId); //check if need to include this line
+        // //If reply does not exist return error
+        // if (reply == null) {
+        //     next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
+        //     return res.status(500).json({
+        //         "success": false,
+        //         "data": null,
+        //         "message": "Reply does not exist."
+        //     });
+        // }
+        //check if user has voted on this reply before
+        const vote = await replyService.checkForVote(userData.userId, replyId);
+        //if vote exists and is the same type return
+        if (vote && vote.type == voteData.type) {
+            logger.info(`Vote: {voteId: ${vote.voteId}} for {replyId: ${replyId}} by {userId: ${userData.userId}} already exists`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    voteId: vote.voteId
+                },
+                "message": "User has already voted on this reply."
+            });
+        } 
+        //else if vote exists but is a different type change it
+        else if (vote && vote.type != voteData.type) {
+            const results = await replyService.changeVoteType(vote, voteData.type);
+            if (results) {
+                logger.info(`Vote: {voteId: ${vote.voteId}} for {replyId: ${replyId}} by {userId: ${userData.userId}} has been changed to {type: ${voteData.type}}`);
+                return res.status(200).json({  
+                    "success": true,
+                    "data": {
+                        voteId: vote.voteId
+                    },
+                    "message": "User vote has been updated."
+                });
+            }            
+        } 
+        //else if vote doesnt exist create it
+        else {
+            //Create vote record and update reply voteCount
+            const results = await replyService.voteForumReply(
+                user.userId,
+                replyId,
+                true);
+            if (results) {
+                logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
+                return res.status(200).json({  
+                    "success": true,
+                    "data": {
+                        voteId: results.voteId
+                    },
+                    "message": "Vote Created Successfully."
+                });
+            }
+        }
     } catch (error) {
+        let errMsg = "Server is unable to process the request.";
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error);
+        else {
+            if (error.message === "insert or update on table \"vote\" violates foreign key constraint \"vote_parentId_fkey\"") {
+                errMsg = "Reply does not exist.";
+            }
+            next(error);
+        } 
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": "Server is unable to process the request." 
+            "message": errMsg
         });
     }
-}; //End of upvoteForumReply
+}; //End of voteForumReply
 
-exports.downvoteForumReply = async (req, res, next) => {
-    logger.info("downvoteForumReply running");
+exports.deleteForumReplyVote = async (req, res, next) => {
+    logger.info("deleteForumReplyVote running");
     const replyId = req.params.r_id;
+    const userData = req.body.userData;
     try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+        //Make sure there is a user with the userId before upvoting reply
+        const user = await userService.getIfNotCreateUser(userData);
+        //check if user has voted on this reply before
+        const vote = await replyService.checkForVote(userData.userId, replyId);
+        if (vote == null) {
+            next(new ApplicationError(`Vote by {userId: ${user.userId}} does not exist for {replyId: ${replyId}}`));
+            return res.status(500).json({
+                "success": false,
+                "data": null,
+                "message": "Vote does not exist."
+            });
+        }
+        const results = await replyService.unvoteForumReply(vote, replyId);
+        if (results) {
+            logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": null,
+                "message": "Vote Deleted Successfully."
+            });
+        }        
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
@@ -127,7 +202,7 @@ exports.downvoteForumReply = async (req, res, next) => {
             "message": "Server is unable to process the request." 
         });
     }
-}; //End of downvoteForumReply
+}; //End of deleteForumReplyVote
 
 exports.editForumReply = async (req, res, next) => {
     logger.info("editForumReply running");
@@ -162,7 +237,6 @@ exports.editForumReply = async (req, res, next) => {
             replyData.replyContent,
             user.userId,
             reply);
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         if (results) {
             logger.info(`Successfully updated reply: {replyId: ${results.replyId}}`);
             return res.status(200).json({  
@@ -192,7 +266,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
     const userData = req.body.userData;
     try {        
         //Make sure there is a user with the userId before making answer as correct
-        const user = await userService.getIfNotCreateUser(userData);
+        //const user = await userService.getIfNotCreateUser(userData);
         // Check if reply with replyId provided exists
         const reply = await replyService.getReplyById(replyId);
         //Check if post with questionId exist
@@ -216,7 +290,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
             });
         }
         //Update reply answer as correct
-        replyData.isAnswer = (replyData.isAnswer === "true") ? true : false;
+        replyData.isAnswer = replyData.isAnswer === "true";
         const results = await replyService.markForumReplyAsCorrectAnswer(replyData.isAnswer, reply);
         if (results) {
             logger.info(`Successfully updated reply answer as correct: ${results.replyId}`);
