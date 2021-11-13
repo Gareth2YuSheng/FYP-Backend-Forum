@@ -44,7 +44,8 @@ exports.getReplies = (questionId, count, page) => { //send user data as well
                 offset: offset,
                 order: [ 
                     ["isAnswer", "DESC"],
-                    ["voteCount", "DESC"]
+                    ["voteCount", "DESC"],
+                    ["createdAt", "DESC"]
                 ],
                 where: { parentId: questionId },
                 include: [{
