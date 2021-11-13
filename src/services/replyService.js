@@ -59,6 +59,21 @@ exports.getReplies = (questionId, count, page) => { //send user data as well
     });
 } //End of getReplies
 
+exports.getQuestionVotes = (replyIds, userId) => { //send user data as well
+    logger.info("getQuestionVotes running");
+    //get votes for a user with the given userId for the given replyIds
+    return new Promise(async (res, rej) => {
+        try {
+            const votes = await models.Vote.findAll({ 
+                where: { userId: userId, parentId: replyIds }
+            });                  
+            res(votes);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getQuestionVotes
+
 exports.getReplyCountForQuestion = (questionId) => { //send user data as well
     logger.info("getReplyCountForQuestion running");
     //get replies for a post with the given postId
