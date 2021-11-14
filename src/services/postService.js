@@ -67,6 +67,35 @@ exports.getPostById = (postId) => {
     });
 } //End of getPostById
 
+exports.getPostDetailsById = (postId) => {
+    logger.info("getPostDetailsById running");
+    //get forum post with the postId provided
+    return new Promise(async (res, rej) => {
+        try {
+            const result = await models.Post.findOne({
+                where: { postId: postId },
+                include: [{
+                    attributes: ["cloudinaryUrl"],
+                    model: models.File
+                }, {
+                    attributes: ["topicName", "subjectId"],
+                    model: models.Topic,               
+                    include: [{
+                        attributes: ["subjectName"],
+                        model: models.Subject
+                    }]
+                }, {
+                    attributes: ["firstName", "lastName", "profileImage"],
+                    model: models.User
+                }]
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getPostDetailsById
+
 exports.getPosts = (count, page, subject, topic) => { //send user data as well
     logger.info("getPosts running");
     const offset = (count*(page-1));
@@ -81,7 +110,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset, 
                     order: [
-                        ['createdAt', 'DESC']
+                        ["createdAt", "DESC"]
                     ],
                     include: [{
                         attributes: ["cloudinaryUrl"],
@@ -107,7 +136,7 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset,  
                     order: [
-                        ['createdAt', 'DESC']
+                        ["createdAt", "DESC"]
                     ],               
                     include: [
                     {

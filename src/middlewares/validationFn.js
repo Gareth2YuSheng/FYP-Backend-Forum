@@ -10,6 +10,7 @@ function objValidateEmptyOrNull(object) { //if Valid return true, Invalid return
 }
 
 function validateUUID(uuid) {
+    if (uuid == null || uuid === "") return false;
     const reUuid = new RegExp(`^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$`);
     return reUuid.test(uuid);
 }
@@ -28,7 +29,7 @@ const validationFn = {
             req.body.file = JSON.parse(req.body.file);
         }
 
-        const questionData = req.body.questionData;    
+        const questionData = req.body.questionData;   
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
@@ -61,6 +62,7 @@ const validationFn = {
         const questionId = req.params.q_id;
         const questionData = req.body.questionData;    
         const userData = req.body.userData; //remove later once login is setup
+        //no validation for topicData or questionData
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
@@ -108,6 +110,28 @@ const validationFn = {
             });
         }
     }, //End of validateGetForumQuestions
+
+    validateGetForumQuestion: function(req, res, next) {
+        logger.info("validateGetForumQuestion middleware called");
+        let errorMsg = "";
+        const questionId = req.params.q_id;
+
+        //Check for valid questionId 
+        if (!validateUUID(questionId)) {
+            errorMsg = "Invalid questionId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateGetForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateGetForumQuestion
 
     validateDeleteForumQuestion: function(req, res, next) {
         logger.info("validateDeleteForumQuestion middleware called");
@@ -227,15 +251,15 @@ const validationFn = {
         logger.info("validateGetForumQuestionReplies middleware called");
         let errorMsg = "";
         const questionId = req.params.q_id;
-        const { count, page } = req.query;
+        const { count, page, userId } = req.query;
 
         //Null or empty check
-        if (count == null || count === "" || page == null || page === "") {
-            errorMsg = "Missing count or page number";
+        if (count == null || count === "" || page == null || page === "" || userId == null || userId === "") {
+            errorMsg = "Missing count or page number or userId";
         }
         //Check for valid questionId 
-        else if (!validateUUID(questionId)) {
-            errorMsg = "Invalid questionId";
+        else if (!validateUUID(questionId) || !validateUUID(userId)) {
+            errorMsg = "Invalid questionId or userId";
         }
 
         if (errorMsg === "") {

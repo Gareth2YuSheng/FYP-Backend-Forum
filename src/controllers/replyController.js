@@ -8,12 +8,14 @@ const PostReply = require("../models/PostReply");
 exports.getForumQuestionReplies = async (req, res, next) => {
     logger.info("getForumQuestionReply running");
     const questionId = req.params.q_id;
-    const { count, page } = req.query;    
+    const { count, page, userId } = req.query;    
     try { //sanitize results later
         const replyCount = await replyService.getReplyCountForQuestion(questionId);
-        let replies;
+        let replies, votes;
         if (replyCount > 0) {
             replies = await replyService.getReplies(questionId, count, page);
+            const replyIds = replies.map(reply => (reply.replyId));
+            votes = await replyService.getQuestionVotes(replyIds, userId);
         } 
         //return response regardless of if there are replies or not
         logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}} with {replyCount: ${replyCount}}`);
@@ -21,7 +23,8 @@ exports.getForumQuestionReplies = async (req, res, next) => {
             "success": true,
             "data": {
                 replyCount: replyCount,
-                replies: replies
+                replies: replies,
+                votes: votes
                 },
             "message": null 
         });
