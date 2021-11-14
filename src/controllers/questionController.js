@@ -64,6 +64,39 @@ exports.getForumQuestionDetails = async (req, res, next) => {
     }
 }; //End of getForumQuestionDetails
 
+exports.getForumQuestionCountBySubject = async (req, res, next) => {
+    logger.info("getForumQuestionCountBySubject running");
+    const questionId = req.params.q_id;
+    try {        
+        //get subject data
+        const subjects = await topicService.getAllSubjects();     
+        //get question counts
+        let results = {}, general = 0, count = 0;
+        for (let s of subjects) {
+            count = await topicService.getQuestionCountBySubjects(s.subjectId);
+            results[s.subjectName] = count;
+            general += count;
+        } 
+        results["General"] = general;
+        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
+        return res.status(200).json({  
+            "success": true,
+            "data": results,
+            "message": null 
+        });
+    } catch (error) {
+        //check if post exists
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error);
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": "Server is unable to process the request." 
+        });
+    }
+}; //End of getForumQuestionCountBySubject
+
 exports.createForumQuestion = async (req, res, next) => {
     logger.info("createForumQuestion running");
     const questionData = req.body.questionData;    
