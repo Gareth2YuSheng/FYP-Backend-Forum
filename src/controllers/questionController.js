@@ -42,7 +42,7 @@ exports.getForumQuestionDetails = async (req, res, next) => {
     const questionId = req.params.q_id;
     try {        
         //get question data
-        const post = await postService.getPostById(questionId);
+        const post = await postService.getPostDetailsById(questionId);
         //get question replies
         // const replies
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
