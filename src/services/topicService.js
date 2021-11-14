@@ -55,6 +55,51 @@ exports.getIfNotCreateSubject = (subjectId, subjectName) => {
     });
 } //End of getIfNotCreateSubject
 
+exports.getAllSubjects = () => {
+    logger.info("getAllSubjects running");
+    //get all subjects from subject table
+    return new Promise(async (res, rej) => {
+        try {
+            const results = await models.Subject.findAll();
+            res(results);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getAllSubjects
+
+exports.getAllTopicsForASubject = (subjectId) => {
+    logger.info("getAllTopicsForASubject running");
+    //get all topics for a subject from topic table
+    return new Promise(async (res, rej) => {
+        try {             
+            const results = await models.Topic.findAll({
+                where: { subjectId: subjectId }
+            });
+            res(results);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getAllTopicsForASubject
+
+exports.getQuestionCountBySubjects = (subjectId) => {
+    logger.info("getQuestionCountBySubjects running");
+    //get all subjects question count from database
+    return new Promise(async (res, rej) => {
+        try {
+            const topics = await this.getAllTopicsForASubject(subjectId);
+            const topicIds = topics.map(topic => (topic.topicId));
+            const results = await models.Post.count({
+                where: { topicId: topicIds }
+            });
+            res(results);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getQuestionCountBySubjects
+
 // exports.getTopicById = (topicId) => {
 //     logger.info("getTopicById running");
 //     //get topic name, parentId and id

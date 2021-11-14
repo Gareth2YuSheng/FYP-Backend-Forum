@@ -37,6 +37,7 @@ exports.appRoute = router => {
     router.get("/question/:q_id/details", verifyFn.verifyToken, validationFn.validateGetForumQuestion, questionController.getForumQuestionDetails);
     router.get("/reply/:q_id?", verifyFn.verifyToken, validationFn.validateGetForumQuestionReplies, replyController.getForumQuestionReplies);
     router.get("/question/all?", verifyFn.verifyToken, validationFn.validateGetForumQuestions, questionController.getForumQuestions);
+    router.get("/question/subject/count", verifyFn.verifyToken, questionController.getForumQuestionCountBySubject);
 
     //POST
     router.post("/login", authController.login);
