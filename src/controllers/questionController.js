@@ -48,7 +48,7 @@ exports.getForumQuestionDetails = async (req, res, next) => {
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         return res.status(200).json({  
             "success": true,
-            "data": null,
+            "data": {post},
             "message": null 
         });
     } catch (error) {
@@ -135,15 +135,21 @@ exports.editForumQuestionDetails = async (req, res, next) => {
                 "message": "Unauthorized User." 
             });
         }
-        //Check if post topicId is the same as the new topic data
-        const incoming_topicId = topicData.children.slice(-1)[0].topicId;
         let topicId;
-        if (incoming_topicId != post.topicId) { //if new topicId sent update new topic
-            const topic = await topicService.getTopicFromTopicData(topicData);
-            topicId = topic.topicId;
+        //if topicData was sent
+        if (topicData) {
+            //Check if post topicId is the same as the new topic data
+            const incoming_topicId = topicData.children.slice(-1)[0].topicId;            
+            if (incoming_topicId != post.topicId) { //if new topicId sent update new topic
+                const topic = await topicService.getTopicFromTopicData(topicData);
+                topicId = topic.topicId;
+            } else { //else use back the old topic id
+                topicId = post.topicId;
+            }
         } else { //else use back the old topic id
             topicId = post.topicId;
         }
+        
         //Update question data
         const results = await postService.editPost(
             questionData.questionTitle,

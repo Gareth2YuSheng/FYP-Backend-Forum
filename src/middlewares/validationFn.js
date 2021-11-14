@@ -29,7 +29,7 @@ const validationFn = {
             req.body.file = JSON.parse(req.body.file);
         }
 
-        const questionData = req.body.questionData;    
+        const questionData = req.body.questionData;   
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
@@ -62,6 +62,7 @@ const validationFn = {
         const questionId = req.params.q_id;
         const questionData = req.body.questionData;    
         const userData = req.body.userData; //remove later once login is setup
+        //no validation for topicData or questionData
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
@@ -109,6 +110,28 @@ const validationFn = {
             });
         }
     }, //End of validateGetForumQuestions
+
+    validateGetForumQuestion: function(req, res, next) {
+        logger.info("validateGetForumQuestion middleware called");
+        let errorMsg = "";
+        const questionId = req.params.q_id;
+
+        //Check for valid questionId 
+        if (!validateUUID(questionId)) {
+            errorMsg = "Invalid questionId";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateGetForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateGetForumQuestion
 
     validateDeleteForumQuestion: function(req, res, next) {
         logger.info("validateDeleteForumQuestion middleware called");

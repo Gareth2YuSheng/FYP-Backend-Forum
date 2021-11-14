@@ -27,14 +27,14 @@ const upload = multer({
 //Match URL with controllers
 exports.appRoute = router => {
     //Testing routes remove later
-    router.get("/api/test", testController.testRouteFunc);
-    router.get("/api/subject_grade", testController.subjectsGrade);
-    router.post("/api/test", testController.testRouteFuncPost);
-    router.put("/api/test", testController.testRouteFuncPut);
-    router.delete("/api/test", testController.testRouteFuncDelete);
+    // router.get("/api/test", testController.testRouteFunc);
+    // router.get("/api/subject_grade", testController.subjectsGrade);
+    // router.post("/api/test", testController.testRouteFuncPost);
+    // router.put("/api/test", testController.testRouteFuncPut);
+    // router.delete("/api/test", testController.testRouteFuncDelete);
 
     //GET
-    router.get("/question/:q_id/details", verifyFn.verifyToken, questionController.getForumQuestionDetails);
+    router.get("/question/:q_id/details", verifyFn.verifyToken, validationFn.validateGetForumQuestion, questionController.getForumQuestionDetails);
     router.get("/reply/:q_id?", verifyFn.verifyToken, validationFn.validateGetForumQuestionReplies, replyController.getForumQuestionReplies);
     router.get("/question/all?", verifyFn.verifyToken, validationFn.validateGetForumQuestions, questionController.getForumQuestions);
 
