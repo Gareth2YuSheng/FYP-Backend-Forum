@@ -170,7 +170,7 @@ exports.unvoteForumReply = (vote, replyId) => {
     //delete user's vote for a forum post reply 
     return new Promise(async (res, rej) => {
         try{
-            const increment = (vote.type) ? 1 : -1;
+            const increment = (vote.type) ? -1 : 1;
             // const result = await models.Vote.destroy({
             //     where: { 
             //         parentId: parentId,
