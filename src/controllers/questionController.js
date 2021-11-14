@@ -48,7 +48,7 @@ exports.getForumQuestionDetails = async (req, res, next) => {
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         return res.status(200).json({  
             "success": true,
-            "data": null,
+            "data": {post},
             "message": null 
         });
     } catch (error) {
