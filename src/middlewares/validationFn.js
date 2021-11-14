@@ -29,7 +29,7 @@ const validationFn = {
             req.body.file = JSON.parse(req.body.file);
         }
 
-        const questionData = req.body.questionData;    
+        const questionData = req.body.questionData;   
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
@@ -62,6 +62,7 @@ const validationFn = {
         const questionId = req.params.q_id;
         const questionData = req.body.questionData;    
         const userData = req.body.userData; //remove later once login is setup
+        //no validation for topicData or questionData
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
