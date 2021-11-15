@@ -188,7 +188,7 @@ exports.deleteForumReplyVote = async (req, res, next) => {
         }
         const results = await replyService.unvoteForumReply(vote, replyId);
         if (results) {
-            logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
+            logger.info(`Successfully deleted vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
             return res.status(200).json({  
                 "success": true,
                 "data": null,
