@@ -72,10 +72,12 @@ exports.getPostDetailsById = (postId) => {
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await models.Post.findOne({
+            const result = await models.Post.findAll({
                 where: { postId: postId },
+                order: [[models.File, "fileId", "DESC"]],
                 include: [{
-                    attributes: ["cloudinaryUrl"],
+                    attributes: ["fileId","cloudinaryUrl"],
+                    
                     model: models.File
                 }, {
                     attributes: ["topicName", "subjectId"],
@@ -110,10 +112,11 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset, 
                     order: [
-                        ["createdAt", "DESC"]
+                        ["createdAt", "DESC"],
+                        [models.File, "fileId", "DESC"]
                     ],
                     include: [{
-                        attributes: ["cloudinaryUrl"],
+                        attributes: ["fileId","cloudinaryUrl"],
                         model: models.File
                     }, {
                         attributes: ["topicName", "subjectId"],
@@ -136,11 +139,12 @@ exports.getPosts = (count, page, subject, topic) => { //send user data as well
                     limit: count, 
                     offset: offset,  
                     order: [
-                        ["createdAt", "DESC"]
+                        ["createdAt", "DESC"],
+                        [models.File, "fileId", "DESC"]
                     ],               
                     include: [
                     {
-                        attributes: ["cloudinaryUrl"],
+                        attributes: ["fileId","cloudinaryUrl"],
                         model: models.File
                     },
                     {
