@@ -72,7 +72,7 @@ exports.getPostDetailsById = (postId) => {
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            const result = await models.Post.findAll({
+            const result = await models.Post.findOne({
                 where: { postId: postId },
                 order: [[models.File, "fileId", "DESC"]],
                 include: [{
