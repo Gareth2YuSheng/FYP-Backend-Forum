@@ -40,7 +40,7 @@ const validationFn = {
             errorMsg = "Missing data in questionData";
         } else if (!topicData.subjectId || !topicData.subjectName || !topicData.children) {
             errorMsg = "Missing data in topicData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
         }
 
@@ -166,7 +166,7 @@ const validationFn = {
             errorMsg = "Missing replyData or userData";
         } else if (!replyData.replyContent) {
             errorMsg = "Missing data in replyData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
         }
 
@@ -284,7 +284,7 @@ const validationFn = {
         //Null or empty check
         if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(voteData)) {
             errorMsg = "Missing userData or voteData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
         } 
         //Check for valid replyId
