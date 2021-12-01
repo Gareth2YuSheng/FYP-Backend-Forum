@@ -103,7 +103,7 @@ exports.createForumQuestion = async (req, res, next) => {
     const userData = req.body.userData; //remove later once login is setup
     const topicData = req.body.topicData;
     const files = req.files; //from multer
-    const base64Files = req.body.file; //from req body from frontend
+    const base64Files = (req.body.file != null) ? req.body.file : []; //from req body from frontend
     try {
         //Make sure there is a user with the userId before creating the post
         //Can remove the check once we start using our own login and register

@@ -25,14 +25,6 @@ async function resetTables() {
     models.Role.create({
         roleName: "PARENT"
     });
-    //Test User and Post, remove later
-    models.User.create({
-        email: "user1@users.com",
-        firstName: "Bob",
-        lastName: "The Builder",
-        password: "password",
-        roleId: 1
-    });
 }
 
 resetTables();

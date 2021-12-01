@@ -24,6 +24,13 @@ const Topic = sequelize.define("Topic", {
             validate: {
                 notNull: true
             }
+        },
+        gradeId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         }
     }, {
         tableName: "topic",

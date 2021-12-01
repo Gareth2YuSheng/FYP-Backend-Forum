@@ -77,15 +77,20 @@ exports.getPostDetailsById = (postId) => {
                 order: [[models.File, "fileId", "DESC"]],
                 include: [{
                     attributes: ["fileId","cloudinaryUrl"],
-                    
                     model: models.File
                 }, {
-                    attributes: ["topicName", "subjectId"],
+                    attributes: ["topicName", "subjectId", "gradeId"],
                     model: models.Topic,               
-                    include: [{
-                        attributes: ["subjectName"],
-                        model: models.Subject
-                    }]
+                    include: [
+                        {
+                            attributes: ["subjectName"],
+                            model: models.Subject
+                        },
+                        {
+                            attributes: ["gradeName"],
+                            model: models.Grade
+                        }
+                    ]
                 }, {
                     attributes: ["firstName", "lastName", "profileImage"],
                     model: models.User
