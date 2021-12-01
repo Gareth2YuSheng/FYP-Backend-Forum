@@ -15,6 +15,12 @@ function validateUUID(uuid) {
     return reUuid.test(uuid);
 }
 
+function validateInt(num) {
+    if (num == null || num === "") return false;
+    const reInt = new RegExp(`^[0-9]+$`);
+    return reInt.test(num);
+}
+
 const validationFn = {
 
     //FORUM VALIDATIONS
@@ -104,7 +110,11 @@ const validationFn = {
         if (count == null || count === "" || page == null || page === "") {
             errorMsg = "Missing count or page number";
         }
-        //Check for valid subjectId or gradeId and topicId 
+        //Check for valid count and page
+        else if (!validateInt(count) || !validateInt(page) || page < 1) {
+            errorMsg = "Invalid count or page num";
+        }
+        //Check for valid subjectId and gradeId and topicId 
         else if ((subject && !validateUUID(subject)) || (grade && !validateUUID(grade)) || (topic && !validateUUID(topic))) {
             errorMsg = "Invalid subjectId or gradeId or topicId";
         }
@@ -270,6 +280,10 @@ const validationFn = {
         //Check for valid questionId 
         else if (!validateUUID(questionId) || !validateUUID(userId)) {
             errorMsg = "Invalid questionId or userId";
+        }
+        //Check for valid count and page
+        else if (!validateInt(count) || !validateInt(page) || page < 1) {
+            errorMsg = "Invalid count or page num";
         }
 
         if (errorMsg === "") {

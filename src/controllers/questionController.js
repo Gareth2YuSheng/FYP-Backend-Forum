@@ -6,9 +6,9 @@ const topicService = require("../services/topicService");
 
 exports.getForumQuestions = async (req, res, next) => {
     logger.info("getForumQuestions running");
-    const { count, page, subject, topic } = req.query;
+    const { count, page, subject, topic, grade } = req.query;
     try { //sanitize results later
-        const results = await postService.getPosts(count, page, subject, topic);
+        const results = await postService.getPosts(count, page, subject, topic, grade);
         if (results) {
             logger.info(`Successfully retrieved posts: {count:${count}, page:${page}, subject:${subject}, topic:${topic}}`);
             return res.status(200).json({  
