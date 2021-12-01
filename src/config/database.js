@@ -11,6 +11,7 @@ const PostReply = require("../models/PostReply");
 const Role = require("../models/Role");
 const Vote = require("../models/Vote");
 const Subject = require("../models/Subject");
+const Grade = require("../models/Grade");
 const File = require("../models/File");
 
 //Define Associations
@@ -101,6 +102,18 @@ sequelize.models.Subject.hasMany(sequelize.models.Topic, {
 sequelize.models.Topic.belongsTo(sequelize.models.Subject, {
     foreignKey: {
         name: "subjectId"
+    }
+});
+
+//grade Table
+sequelize.models.Grade.hasMany(sequelize.models.Topic, {
+    foreignKey: {
+        name: "gradeId"
+    }
+});
+sequelize.models.Topic.belongsTo(sequelize.models.Grade, {
+    foreignKey: {
+        name: "gradeId"
     }
 });
 

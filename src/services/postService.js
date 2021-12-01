@@ -74,15 +74,19 @@ exports.getPostDetailsById = (postId) => {
         try {
             const result = await models.Post.findOne({
                 where: { postId: postId },
+                order: [[models.File, "fileId", "DESC"]],
                 include: [{
-                    attributes: ["cloudinaryUrl"],
+                    attributes: ["fileId","cloudinaryUrl"],
                     model: models.File
                 }, {
-                    attributes: ["topicName", "subjectId"],
+                    attributes: ["topicName", "subjectId", "gradeId"],
                     model: models.Topic,               
                     include: [{
                         attributes: ["subjectName"],
                         model: models.Subject
+                    }, {
+                        attributes: ["gradeName"],
+                        model: models.Grade
                     }]
                 }, {
                     attributes: ["firstName", "lastName", "profileImage"],
@@ -96,67 +100,47 @@ exports.getPostDetailsById = (postId) => {
     });
 } //End of getPostDetailsById
 
-exports.getPosts = (count, page, subject, topic) => { //send user data as well
+exports.getPosts = (count, page, subject, topic, grade) => { //send user data as well
     logger.info("getPosts running");
     const offset = (count*(page-1));
     if (subject == null) subject = "";
     if (topic == null) topic = "";
+    if (grade == null) grade = "";
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            let posts;
-            if (subject==="" && topic==="") { //if no subject or topic was provided
-                posts = await models.Post.findAll({ 
-                    limit: count, 
-                    offset: offset, 
-                    order: [
-                        ["createdAt", "DESC"]
-                    ],
+            let whereOptions = {}
+            if (subject !== "") whereOptions.subjectId = subject;
+            if (topic !== "") whereOptions.topicId = topic;
+            if (grade !== "") whereOptions.gradeId = grade;
+            const posts = await models.Post.findAll({ 
+                limit: count, 
+                offset: offset,  
+                order: [
+                    ["createdAt", "DESC"],
+                    [models.File, "fileId", "DESC"]
+                ],               
+                include: [
+                {
+                    attributes: ["fileId","cloudinaryUrl"],
+                    model: models.File
+                },
+                {
+                    attributes: ["topicName", "subjectId", "gradeId"],
+                    model: models.Topic,      
+                    where: whereOptions,                  
                     include: [{
-                        attributes: ["cloudinaryUrl"],
-                        model: models.File
+                        attributes: ["subjectName"],
+                        model: models.Subject
                     }, {
-                        attributes: ["topicName", "subjectId"],
-                        model: models.Topic,               
-                        include: [{
-                            attributes: ["subjectName"],
-                            model: models.Subject
-                        }]
-                    }, {
-                        attributes: ["firstName", "lastName", "profileImage"],
-                        model: models.User
+                        attributes: ["gradeName"],
+                        model: models.Grade
                     }]
-                });
-            } else {
-                whereOptions = {}
-                if (subject!=="" && topic==="") whereOptions = { subjectId: subject }
-                else if (subject==="" && topic!=="") whereOptions = { topicId: topic }
-                else whereOptions = { topicId: topic, subjectId: subject }
-                posts = await models.Post.findAll({ 
-                    limit: count, 
-                    offset: offset,  
-                    order: [
-                        ["createdAt", "DESC"]
-                    ],               
-                    include: [
-                    {
-                        attributes: ["cloudinaryUrl"],
-                        model: models.File
-                    },
-                    {
-                        attributes: ["topicName", "subjectId"],
-                        model: models.Topic,      
-                        where: whereOptions,                  
-                        include: [{
-                            attributes: ["subjectName"],
-                            model: models.Subject
-                        }]
-                    }, {
-                        attributes: ["firstName", "lastName", "profileImage"],
-                        model: models.User
-                    }]
-                });
-            }        
+                }, {
+                    attributes: ["firstName", "lastName", "profileImage"],
+                    model: models.User
+                }]
+            });   
             res(posts);
         } catch (error) {
             rej(new DatabaseError(error.message));
