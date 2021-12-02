@@ -201,13 +201,6 @@ exports.editForumQuestionDetails = async (req, res, next) => {
                 "message": "Question Updated Successfully." 
             });
         }
-        // return res.status(200).json({  
-        //     "success": true,
-        //     "data": {
-        //         postId: "yes"
-        //     },
-        //     "message": "Question Updated Successfully." 
-        // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
