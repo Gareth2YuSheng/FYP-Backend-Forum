@@ -184,10 +184,14 @@ const validationFn = {
         logger.info("validateDeleteForumQuestion middleware called");
         let errorMsg = "";
         const questionId = req.params.q_id;
-
+        const userData = req.body.userData;
         //Check for valid questionId 
         if (!validateUUID(questionId)) {
             errorMsg = "Invalid questionId";
+        }
+        //Check for valid userId
+        else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userData";
         }
 
         if (errorMsg === "") {
