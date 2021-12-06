@@ -55,6 +55,22 @@ exports.getIfNotCreateSubject = (subjectId, subjectName) => {
     });
 } //End of getIfNotCreateSubject
 
+exports.getIfNotCreateGrade = (gradeId, gradeName) => {
+    logger.info("getIfNotCreateGrade running");
+    //get grade details if not create new grade with the details provided
+    return new Promise(async (res, rej) => {
+        try {
+            const [grade, created] = await models.Grade.findOrCreate({
+                where: { gradeId: gradeId },
+                defaults: { gradeName: gradeName }
+            });
+            res(grade);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getIfNotCreateGrade
+
 exports.getAllSubjects = () => {
     logger.info("getAllSubjects running");
     //get all subjects from subject table
@@ -113,7 +129,7 @@ exports.getQuestionCountBySubjects = (subjectId) => {
 //     });
 // } //End of getTopicById
 
-exports.getIfNotCreateTopic = (topicId, topicName, subjectId) => {
+exports.getIfNotCreateTopic = (topicId, topicName, subjectId, gradeId) => {
     logger.info("getIfNotCreateTopic running");
     //get topic details if not create new topic with the details provided
     return new Promise(async (res, rej) => {
@@ -122,7 +138,8 @@ exports.getIfNotCreateTopic = (topicId, topicName, subjectId) => {
                 where: { topicId: topicId },
                 defaults: { 
                     topicName: topicName,
-                    subjectId: subjectId
+                    subjectId: subjectId,
+                    gradeId: gradeId
                 }
             });   
             res(topic);
@@ -158,13 +175,16 @@ exports.getTopicFromTopicData = (topicData) => {
             let topic, parentTopicId = null;
             //get subject first
             const subject = await this.getIfNotCreateSubject(topicData.subjectId, topicData.subjectName);
+            //get grade second
+            const grade = await this.getIfNotCreateGrade(topicData.gradeId, topicData.gradeName);
             //get/create each topic in the topics list
             const topics = topicData.children;
             for (let x=0; x<topics.length; x++) {
                 topic = await this.getIfNotCreateTopic( 
                     topics[x].topicId,
                     topics[x].topicName,
-                    subject.subjectId
+                    subject.subjectId,
+                    grade.gradeId
                 );
                 this.getIfNotCreateTopicAssociation(topic.topicId, parentTopicId);  
                 parentTopicId = topic.topicId;            

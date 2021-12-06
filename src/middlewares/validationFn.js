@@ -15,6 +15,36 @@ function validateUUID(uuid) {
     return reUuid.test(uuid);
 }
 
+function validateInt(num) {
+    if (num == null || num === "") return false;
+    const reInt = new RegExp(`^[0-9]+$`);
+    return reInt.test(num);
+}
+
+function validateTopicData(topicData) {
+    let errorMsg = "";
+    //Null checks
+    if (!objValidateEmptyOrNull(topicData)) {
+        errorMsg = "Missing topicData";
+    } else if (!topicData.subjectId || !topicData.subjectName || !topicData.gradeId || !topicData.gradeName || !topicData.children) {
+        errorMsg = "Missing data in topicData";
+    }
+    //Check for valid subjectId 
+    else if (!validateUUID(topicData.subjectId)) {
+        errorMsg = "Invalid subjectId";
+    }
+    //Check for valid gradeId 
+    else if (!validateUUID(topicData.gradeId)) {
+        errorMsg = "Invalid gradeId";
+    }
+    //Check if topicData contains a topic
+    else if (topicData.children.length < 1) {
+        errorMsg = "Topic Data must contain at least 1 topic";
+    }
+    if (errorMsg !== "") return [false, errorMsg];
+    return [true, null];
+}
+
 const validationFn = {
 
     //FORUM VALIDATIONS
@@ -22,27 +52,28 @@ const validationFn = {
         logger.info("validateCreateForumQuestion middleware called");
         let errorMsg = "";
         //parse the data from formData
-        req.body.questionData = JSON.parse(req.body.questionData);    
-        req.body.topicData = JSON.parse(req.body.topicData);
-        req.body.userData = JSON.parse(req.body.userData);
-        if (req.body.file) {
-            req.body.file = JSON.parse(req.body.file);
-        }
+        if (req.body.questionData) req.body.questionData = JSON.parse(req.body.questionData);    
+        if (req.body.topicData) req.body.topicData = JSON.parse(req.body.topicData);
+        if (req.body.userData) req.body.userData = JSON.parse(req.body.userData);
+        if (req.body.file) req.body.file = JSON.parse(req.body.file);
 
         const questionData = req.body.questionData;   
         const topicData = req.body.topicData;
         const userData = req.body.userData; //remove later once login is setup
 
         //Null or empty check
-        if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(topicData)) {
-            errorMsg = "Missing questionData or missing userData or topicData";
+        if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing questionData or missing userData";
         } else if (!questionData.questionTitle || !questionData.questionContent || !questionData.questionObjective) {
             errorMsg = "Missing data in questionData";
-        } else if (!topicData.subjectId || !topicData.subjectName || !topicData.children) {
-            errorMsg = "Missing data in topicData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
         }
+        //Validate topicData
+        const [topicDataValid, topicErrorMsg] = validateTopicData(topicData);
+        if (!topicDataValid) {
+            errorMsg = topicErrorMsg;
+        }        
 
         if (errorMsg === "") { //if no error message move on
             next();
@@ -62,7 +93,7 @@ const validationFn = {
         const questionId = req.params.q_id;
         const questionData = req.body.questionData;    
         const userData = req.body.userData; //remove later once login is setup
-        //no validation for topicData or questionData
+        const topicData = req.body.topicData;
 
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
@@ -71,6 +102,18 @@ const validationFn = {
         //Check for valid questionId 
         else if (!validateUUID(questionId)) {
             errorMsg = "Invalid questionId";
+        }
+        //Check for valid userId 
+        else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userData";
+        }
+        //Validate Topic Data if exists
+        else if (topicData) {
+            //Validate topicData
+            const [topicDataValid, topicErrorMsg] = validateTopicData(topicData);
+            if (!topicDataValid) {
+                errorMsg = topicErrorMsg;
+            }
         }
 
         if (errorMsg === "") {
@@ -88,15 +131,19 @@ const validationFn = {
     validateGetForumQuestions: function(req, res, next) {
         logger.info("validateGetForumQuestions middleware called");
         let errorMsg = "";
-        const { count, page, subject, topic } = req.query;
+        const { count, page, subject, grade, topic } = req.query;
 
         //Null or empty check
         if (count == null || count === "" || page == null || page === "") {
             errorMsg = "Missing count or page number";
         }
-        //Check for valid subjectId and topicId 
-        else if ((subject && !validateUUID(subject)) || (topic && !validateUUID(topic))) {
-            errorMsg = "Invalid subjectId or topicId";
+        //Check for valid count and page
+        else if (!validateInt(count) || !validateInt(page) || page < 1) {
+            errorMsg = "Invalid count or page num";
+        }
+        //Check for valid subjectId and gradeId and topicId 
+        else if ((subject && !validateUUID(subject)) || (grade && !validateUUID(grade)) || (topic && !validateUUID(topic))) {
+            errorMsg = "Invalid subjectId or gradeId or topicId";
         }
 
         if (errorMsg === "") {
@@ -137,10 +184,14 @@ const validationFn = {
         logger.info("validateDeleteForumQuestion middleware called");
         let errorMsg = "";
         const questionId = req.params.q_id;
-
+        const userData = req.body.userData;
         //Check for valid questionId 
         if (!validateUUID(questionId)) {
             errorMsg = "Invalid questionId";
+        }
+        //Check for valid userId
+        else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userData";
         }
 
         if (errorMsg === "") {
@@ -166,8 +217,12 @@ const validationFn = {
             errorMsg = "Missing replyData or userData";
         } else if (!replyData.replyContent) {
             errorMsg = "Missing data in replyData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
+        } 
+        //Check for valid userId 
+        else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userData";
         }
 
         if (errorMsg === "") { //if no error message move on
@@ -261,6 +316,10 @@ const validationFn = {
         else if (!validateUUID(questionId) || !validateUUID(userId)) {
             errorMsg = "Invalid questionId or userId";
         }
+        //Check for valid count and page
+        else if (!validateInt(count) || !validateInt(page) || page < 1) {
+            errorMsg = "Invalid count or page num";
+        }
 
         if (errorMsg === "") {
             next();
@@ -284,7 +343,7 @@ const validationFn = {
         //Null or empty check
         if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(voteData)) {
             errorMsg = "Missing userData or voteData";
-        } else if (!userData.userId || !userData.firstName || !userData.lastName || !userData.email || !userData.roleId) {
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
         } 
         //Check for valid replyId
