@@ -201,13 +201,6 @@ exports.editForumQuestionDetails = async (req, res, next) => {
                 "message": "Question Updated Successfully." 
             });
         }
-        // return res.status(200).json({  
-        //     "success": true,
-        //     "data": {
-        //         postId: "yes"
-        //     },
-        //     "message": "Question Updated Successfully." 
-        // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
@@ -223,6 +216,7 @@ exports.editForumQuestionDetails = async (req, res, next) => {
 exports.deleteForumQuestion = async (req, res, next) => {
     logger.info("deleteForumQuestion running");
     const questionId = req.params.q_id;
+    const userData = req.body.userData;
     try {        
         //Check if post with questionId provided exists
         const post = await postService.getPostById(questionId);
@@ -235,6 +229,15 @@ exports.deleteForumQuestion = async (req, res, next) => {
                 "message": "Question does not exist." 
             });
         } 
+        //If post userId and userData userId do not match
+        else if (post.userId != userData.userId) {
+            next(new ApplicationError(`Unauthorized User trying to delete: {questionId: ${questionId}}`));
+            return res.status(500).json({ 
+                "success": false,
+                "data": null,
+                "message": "Unauthorized User." 
+            });
+        }
         //delete post with questionId
         const results = await postService.deletePost(questionId);
         if (results) {
