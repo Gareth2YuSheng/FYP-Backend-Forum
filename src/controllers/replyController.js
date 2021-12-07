@@ -174,8 +174,8 @@ exports.deleteForumReplyVote = async (req, res, next) => {
     const replyId = req.params.r_id;
     const userData = req.body.userData;
     try {        
-        //Make sure there is a user with the userId before upvoting reply
-        const user = await userService.getIfNotCreateUser(userData);
+        //Make sure there is a user with the userId before unvoting reply
+        // const user = await userService.getIfNotCreateUser(userData);
         //check if user has voted on this reply before
         const vote = await replyService.checkForVote(userData.userId, replyId);
         if (vote == null) {
