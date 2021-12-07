@@ -10,7 +10,7 @@ exports.getForumQuestions = async (req, res, next) => {
     try { //sanitize results later
         const results = await postService.getPosts(count, page, subject, topic, grade);
         if (results) {
-            logger.info(`Successfully retrieved posts: {count:${count}, page:${page}, subject:${subject}, topic:${topic}}`);
+            logger.info(`Successfully retrieved posts: {count: ${count}, page: ${page}, subject: ${subject}, topic: ${topic}, grade: ${grade}}`);
             return res.status(200).json({  
                 "success": true,
                 "data": {
@@ -20,11 +20,6 @@ exports.getForumQuestions = async (req, res, next) => {
             });
         }
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        // return res.status(200).json({  
-        //     "success": true,
-        //     "data": null,
-        //     "message": null 
-        // });
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
@@ -42,15 +37,16 @@ exports.getForumQuestionDetails = async (req, res, next) => {
     const questionId = req.params.q_id;
     try {        
         //get question data
-        const post = await postService.getPostDetailsById(questionId);
-        //get question replies
-        // const replies
+        const results = await postService.getPostDetailsById(questionId);
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": {post},
-            "message": null 
-        });
+        if (results) {
+            logger.info(`Successfully retrieved post: {postId: ${results.postId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {results},
+                "message": null 
+            });
+        }        
     } catch (error) {
         //check if post exists
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
@@ -66,7 +62,6 @@ exports.getForumQuestionDetails = async (req, res, next) => {
 
 exports.getForumQuestionCountBySubject = async (req, res, next) => {
     logger.info("getForumQuestionCountBySubject running");
-    const questionId = req.params.q_id;
     try {        
         //get subject data
         const subjects = await topicService.getAllSubjects();     
@@ -79,11 +74,14 @@ exports.getForumQuestionCountBySubject = async (req, res, next) => {
         } 
         results["General"] = general;
         //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": results,
-            "message": null 
-        });
+        if (results) {
+            logger.info(`Successfully retrieved subject counts`);
+            return res.status(200).json({  
+                "success": true,
+                "data": results,
+                "message": null 
+            });
+        }
     } catch (error) {
         //check if post exists
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
