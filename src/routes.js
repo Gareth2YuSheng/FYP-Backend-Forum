@@ -42,7 +42,7 @@ exports.appRoute = router => {
     //POST
     router.post("/login", authController.login);
     router.post("/register", authController.register);
-    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 5), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
+    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, validationFn.validateCreateForumReply, replyController.createForumReply);
     
     //PUT
