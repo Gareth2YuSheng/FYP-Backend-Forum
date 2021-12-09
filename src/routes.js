@@ -13,7 +13,7 @@ const { FileError } = require("./errors/errors");
 const multer = require("multer");
 const upload = multer({ 
     storage: multer.memoryStorage(), 
-    limits: { fileSize: 2000000, files: 2 }, //set limit for file size and number of file fields 
+    limits: { fileSize: 3000000, files: 2 }, //set limit for file size and number of file fields 
     fileFilter: (req, file, cb) => { //limit the file extentions
         let ext = path.extname(file.originalname);
         if (ext !== ".jpg" && ext !== ".png" && ext !== ".jpeg") {
