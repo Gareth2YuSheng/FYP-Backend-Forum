@@ -13,7 +13,7 @@ const { FileError } = require("./errors/errors");
 const multer = require("multer");
 const upload = multer({ 
     storage: multer.memoryStorage(), 
-    limits: { fileSize: 2000000, files: 2 }, //set limit for file size and number of file fields 
+    limits: { fileSize: 3500000, files: 5 }, //set limit for file size and number of file fields 
     fileFilter: (req, file, cb) => { //limit the file extentions
         let ext = path.extname(file.originalname);
         if (ext !== ".jpg" && ext !== ".png" && ext !== ".jpeg") {
@@ -42,7 +42,7 @@ exports.appRoute = router => {
     //POST
     router.post("/login", authController.login);
     router.post("/register", authController.register);
-    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 5), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
+    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, validationFn.validateCreateForumReply, replyController.createForumReply);
     
     //PUT
