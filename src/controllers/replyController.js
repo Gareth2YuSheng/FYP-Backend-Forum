@@ -139,7 +139,7 @@ exports.voteForumReply = async (req, res, next) => {
             const results = await replyService.voteForumReply(
                 user.userId,
                 replyId,
-                true);
+                voteData.type);
             if (results) {
                 logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
                 return res.status(200).json({  
