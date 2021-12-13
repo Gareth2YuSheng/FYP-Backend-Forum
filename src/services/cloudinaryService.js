@@ -24,8 +24,7 @@ module.exports.uploadFileToCloudinary = function(file) {
             .then((result) => {
                 //Inspect whether I can obtain the file storage id and the url from cloudinary
                 //after a successful upload.
-                //console.log({imageURL: result.url, publicId: result.public_id});
-                let data = { url: result.url, publicId: result.public_id, status: 'success' };
+                let data = { url: result.secure_url, publicId: result.public_id, status: 'success' };
                 res(data);
             }).catch((error) => {
                 rej(new CloudinaryError(error.message));
@@ -48,7 +47,7 @@ module.exports.uploadStreamToCloudinary = function(buffer) {
             function(error, result) {
                 if (result) {
                     logger.info(`Successfully uploaded image: {image_url: ${result.url}}`);
-                    let cloudinaryFileData = { url: result.url, publicId: result.public_id, status: 'success' };
+                    let cloudinaryFileData = { url: result.secure_url, publicId: result.public_id, status: 'success' };
                     res(cloudinaryFileData);
                 }
                 if (error) {
