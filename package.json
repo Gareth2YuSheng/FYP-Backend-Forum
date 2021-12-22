@@ -8,6 +8,7 @@
     "start": "pm2-runtime start ecosystem.config.js",
     "devStart": "nodemon index.js",
     "resetTables": "node ./src/config/resetTables.js",
+    "alterTables": "node ./src/config/alterTables.js",
     "heroku-postbuild": "npm install pm2"
   },
   "repository": {
