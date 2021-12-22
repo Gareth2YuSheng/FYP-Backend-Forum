@@ -204,6 +204,10 @@ const validationFn = {
         if (!validateUUID(questionId)) {
             errorMsg = "Invalid questionId";
         }
+        //Check for null userId
+        else if (!objValidateEmptyOrNull(userData) || userData.userId == null) {
+            errorMsg = "Missing userId"
+        }
         //Check for valid userId
         else if (!validateUUID(userData.userId)) {
             errorMsg = "Invalid userData";
