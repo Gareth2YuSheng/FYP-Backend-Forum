@@ -171,16 +171,9 @@ exports.unvoteForumReply = (vote, replyId) => {
     return new Promise(async (res, rej) => {
         try{
             const increment = (vote.type) ? -1 : 1;
-            // const result = await models.Vote.destroy({
-            //     where: { 
-            //         parentId: parentId,
-            //         userId: userId
-            //     }
-            // });
             const result = await vote.destroy();
             //minus vote value from reply vote count
             const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: replyId } });
-            console.log(result)
             res("Vote deleted successfully");
         } catch (error) {
             rej(new DatabaseError(error.message));

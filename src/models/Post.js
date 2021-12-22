@@ -30,6 +30,15 @@ const Post = sequelize.define("Post", {
                 notEmpty: true
             }
         },
+        likeCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                isInt: true
+            }
+        },
         //Foreign Keys
         userId: {
             type: DataTypes.UUID,

@@ -13,7 +13,7 @@ const { FileError } = require("./errors/errors");
 const multer = require("multer");
 const upload = multer({ 
     storage: multer.memoryStorage(), 
-    limits: { fileSize: 2000000, files: 2 }, //set limit for file size and number of file fields 
+    limits: { fileSize: 3500000, files: 5 }, //set limit for file size and number of file fields 
     fileFilter: (req, file, cb) => { //limit the file extentions
         let ext = path.extname(file.originalname);
         if (ext !== ".jpg" && ext !== ".png" && ext !== ".jpeg") {
@@ -34,7 +34,7 @@ exports.appRoute = router => {
     // router.delete("/api/test", testController.testRouteFuncDelete);
 
     //GET
-    router.get("/question/:q_id/details", verifyFn.verifyToken, validationFn.validateGetForumQuestion, questionController.getForumQuestionDetails);
+    router.get("/question/:q_id/details?", verifyFn.verifyToken, validationFn.validateGetForumQuestion, questionController.getForumQuestionDetails);
     router.get("/reply/:q_id?", verifyFn.verifyToken, validationFn.validateGetForumQuestionReplies, replyController.getForumQuestionReplies);
     router.get("/question/all?", verifyFn.verifyToken, validationFn.validateGetForumQuestions, questionController.getForumQuestions);
     router.get("/question/subject/count", verifyFn.verifyToken, questionController.getForumQuestionCountBySubject);
@@ -42,17 +42,19 @@ exports.appRoute = router => {
     //POST
     router.post("/login", authController.login);
     router.post("/register", authController.register);
-    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 5), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
+    router.post("/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post("/reply/:q_id/create", verifyFn.verifyToken, validationFn.validateCreateForumReply, replyController.createForumReply);
     
     //PUT
     router.put("/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);
+    router.put("/post/:p_id/like", verifyFn.verifyToken, validationFn.validateLikeForumQuestion, questionController.likeForumQuestion);
     router.put("/reply/:r_id/edit", verifyFn.verifyToken, validationFn.validateEditForumReply, replyController.editForumReply);
     router.put("/reply/:r_id/correct", verifyFn.verifyToken, validationFn.validateMarkReplyAsAnswer, replyController.markForumReplyAsCorrectAnswer);
     router.put("/reply/:r_id/vote", verifyFn.verifyToken, validationFn.validateVoteForumReply, replyController.voteForumReply);
 
     //DELETE
     router.delete("/question/:q_id/delete", verifyFn.verifyToken, validationFn.validateDeleteForumQuestion, questionController.deleteForumQuestion);
+    router.delete("/post/:p_id/like", verifyFn.verifyToken, validationFn.validateUnlikeForumQuestion, questionController.unlikeForumQuestion);
     router.delete("/reply/:r_id/vote", verifyFn.verifyToken, validationFn.validateDeleteVoteForumReply, replyController.deleteForumReplyVote);
 
     //sanitization function
