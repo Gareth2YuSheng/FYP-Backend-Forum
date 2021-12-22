@@ -131,11 +131,13 @@ const validationFn = {
     validateGetForumQuestions: function(req, res, next) {
         logger.info("validateGetForumQuestions middleware called");
         let errorMsg = "";
-        const { count, page, subject, grade, topic } = req.query;
+        const { count, page, subject, grade, topic, userId } = req.query;
 
         //Null or empty check
         if (count == null || count === "" || page == null || page === "") {
             errorMsg = "Missing count or page number";
+        } else if (userId == null) {
+            errorMsg = "Missing userId";
         }
         //Check for valid count and page
         else if (!validateInt(count) || !validateInt(page) || page < 1) {
@@ -144,6 +146,10 @@ const validationFn = {
         //Check for valid subjectId and gradeId and topicId 
         else if ((subject && !validateUUID(subject)) || (grade && !validateUUID(grade)) || (topic && !validateUUID(topic))) {
             errorMsg = "Invalid subjectId or gradeId or topicId";
+        }
+        //Check for valid userId
+        else if (!validateUUID(userId)) {
+            errorMsg = "Invalid userId";
         }
 
         if (errorMsg === "") {
@@ -162,10 +168,19 @@ const validationFn = {
         logger.info("validateGetForumQuestion middleware called");
         let errorMsg = "";
         const questionId = req.params.q_id;
+        const { userId } = req.query;
 
         //Check for valid questionId 
         if (!validateUUID(questionId)) {
             errorMsg = "Invalid questionId";
+        }
+        //Null or empty check
+        if (userId == null) {
+            errorMsg = "Missing userId";
+        }
+        //Check for valid userId
+        else if (!validateUUID(userId)) {
+            errorMsg = "Invalid userId";
         }
 
         if (errorMsg === "") {
@@ -333,6 +348,47 @@ const validationFn = {
         }
     }, //End of validateGetForumQuestionReplies
 
+    validateLikeForumQuestion: function(req, res, next) {
+        logger.info("validateLikeForumQuestion middleware called");
+        let errorMsg = "";
+        const postId = req.params.p_id;
+        const userData = req.body.userData;
+        const likeData = req.body.likeData;
+        
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(likeData)) {
+            errorMsg = "Missing userData or likeData";
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
+            errorMsg = "Missing data in userData";
+        } 
+        //Check for valid replyId
+        else if (!validateUUID(postId)) {
+            errorMsg = "Invalid postId";
+        }
+        //check if vote type is missing
+        if (!likeData.type) {
+            errorMsg = "Missing data in likeData";
+        } else {
+            //convert vote type to lowercase
+            likeData.type = likeData.type.toLowerCase();
+        }
+        //check for valid vote type up ONLY
+        if (likeData.type !== "up") {
+            errorMsg = "Invalid like type";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateLikeForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateLikeForumQuestion
+
     validateVoteForumReply: function(req, res, next) {
         logger.info("validateVoteForumReply middleware called");
         let errorMsg = "";
@@ -382,7 +438,7 @@ const validationFn = {
         
         //Null or empty check
         if (!objValidateEmptyOrNull(userData)) {
-            errorMsg = "Missing userData or voteData";
+            errorMsg = "Missing userData";
         } else if (!userData.userId) {
             errorMsg = "Missing data in userData";
         } 
@@ -402,6 +458,35 @@ const validationFn = {
             });
         }
     }, //End of validateDeleteVoteForumReply
+
+    validateUnlikeForumQuestion: function(req, res, next) {
+        logger.info("validateUnlikeForumQuestion middleware called");
+        let errorMsg = "";
+        const postId = req.params.p_id;
+        const userData = req.body.userData;
+        
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing userData";
+        } else if (!userData.userId) {
+            errorMsg = "Missing data in userData";
+        } 
+        //Check for valid replyId
+        else if (!validateUUID(postId)) {
+            errorMsg = "Invalid postId";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateUnlikeForumQuestion Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateUnlikeForumQuestion
 
     //sanitization function
     sanitizeResult: function (req, res, next){

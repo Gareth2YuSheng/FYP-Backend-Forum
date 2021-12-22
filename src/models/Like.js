@@ -1,36 +1,19 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const PostReply = sequelize.define("PostReply", {
-        replyId: {
+const Like = sequelize.define("Like", {
+        likeId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             unique: true,
             primaryKey: true
         },
-        content: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
-        isAnswer: {
+        type: {
             type: DataTypes.BOOLEAN,
-            defaultValue: false,
-            allowNull: false,
-            validate: {
-                notNull: true
-            }
-        },
-        voteCount: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
             allowNull: false,
             validate: {
                 notNull: true,
-                isInt: true
             }
         },
         //Foreign Keys
@@ -49,8 +32,9 @@ const PostReply = sequelize.define("PostReply", {
             }
         }
     }, {
-        tableName: "postReply"
+        tableName: "like",
+        timestamps: false
     }
 );
 
-module.exports = PostReply;
+module.exports = Like;
