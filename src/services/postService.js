@@ -78,7 +78,8 @@ exports.getPostDetailsById = (postId, userId) => {
                 order: [[models.File, "fileId", "DESC"]],
                 include: [{
                     attributes: ["fileId","cloudinaryUrl"],
-                    model: models.File
+                    model: models.File,
+                    required: false
                 }, {
                     attributes: ["topicName", "subjectId", "gradeId"],
                     model: models.Topic,               
@@ -111,15 +112,15 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
-            let whereOptions = {};
+            let whereOptions = {}, searchOptions = {};
             if (subject != null && subject !== "") whereOptions.subjectId = subject;
             if (topic != null && topic !== "") whereOptions.topicId = topic;
             if (grade != null && grade !== "") whereOptions.gradeId = grade;
             if (search != null && search !== "") {
-                console.log(search.toLowerCase())
-                // whereOptions.title = {
-                //     [Op.like]: `%${search}%`
-                // };
+                //set search options, no need to .toLowerCase as post title field is CITEXT type
+                searchOptions.title = {
+                    [Op.like]: `%${search}%`
+                };
             }
             logger.info("WHERE OPTIONS:", whereOptions)
             const posts = await models.Post.findAll({ 
@@ -128,11 +129,13 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
                 order: [
                     ["createdAt", "DESC"],
                     [models.File, "fileId", "DESC"]
-                ],               
+                ],         
+                where: searchOptions,      
                 include: [
                 {
                     attributes: ["fileId","cloudinaryUrl"],
-                    model: models.File
+                    model: models.File,
+                    required: false
                 },
                 {
                     attributes: ["topicName", "subjectId", "gradeId"],
