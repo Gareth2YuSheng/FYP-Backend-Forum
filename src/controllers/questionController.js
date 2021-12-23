@@ -6,21 +6,14 @@ const topicService = require("../services/topicService");
 
 exports.getForumQuestions = async (req, res, next) => {
     logger.info("getForumQuestions running");
-    const { count, page, subject, topic, grade, userId } = req.query;
+    const { count, page, subject, topic, grade, userId, search } = req.query;
     try { //sanitize results later
-        const posts = await postService.getPosts(count, page, subject, topic, grade);
-        let likes = null;
-        if (posts.length > 0) {
-            likes = await postService.getLikesForPosts(userId, posts);
-        }
+        const posts = await postService.getPosts(count, page, subject, topic, grade, search, userId);
         if (posts) {
             logger.info(`Successfully retrieved posts: {count: ${count}, page: ${page}, subject: ${subject}, topic: ${topic}, grade: ${grade}}`);
             return res.status(200).json({  
                 "success": true,
-                "data": {
-                    posts,
-                    likes
-                },
+                "data": { posts },
                 "message": null 
             });
         }
@@ -43,18 +36,13 @@ exports.getForumQuestionDetails = async (req, res, next) => {
     const { userId } = req.query;
     try {        
         //get question data
-        const results = await postService.getPostDetailsById(questionId);
-        let like = null;
-        if (results) {
-            like = await postService.getLikesForPost(userId, questionId);
-        }
+        const results = await postService.getPostDetailsById(questionId, userId);
         if (results) {
             logger.info(`Successfully retrieved post: {postId: ${results.postId}}`);
             return res.status(200).json({  
                 "success": true,
                 "data": {
-                    post: results,
-                    like
+                    post: results
                 },
                 "message": null 
             });
