@@ -11,11 +11,9 @@ exports.getForumQuestionReplies = async (req, res, next) => {
     const { count, page, userId } = req.query;    
     try { //sanitize results later
         const replyCount = await replyService.getReplyCountForQuestion(questionId);
-        let replies, votes;
+        let replies = null;
         if (replyCount > 0) {
-            replies = await replyService.getReplies(questionId, count, page);
-            const replyIds = replies.map(reply => (reply.replyId));
-            votes = await replyService.getQuestionVotes(replyIds, userId);
+            replies = await replyService.getReplies(questionId, count, page, userId);
         } 
         //return response regardless of if there are replies or not
         logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}} with {replyCount: ${replyCount}}`);
@@ -23,9 +21,8 @@ exports.getForumQuestionReplies = async (req, res, next) => {
             "success": true,
             "data": {
                 replyCount: replyCount,
-                replies: replies,
-                votes: votes
-                },
+                replies
+            },
             "message": null 
         });
         
@@ -95,17 +92,6 @@ exports.voteForumReply = async (req, res, next) => {
     try {        
         //Make sure there is a user with the userId before upvoting reply
         const user = await userService.getIfNotCreateUser(userData);
-        // //Check if reply with replyId provided exists
-        // const reply = await replyService.getReplyById(replyId); //check if need to include this line
-        // //If reply does not exist return error
-        // if (reply == null) {
-        //     next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
-        //     return res.status(500).json({
-        //         "success": false,
-        //         "data": null,
-        //         "message": "Reply does not exist."
-        //     });
-        // }
         //check if user has voted on this reply before
         const vote = await replyService.checkForVote(userData.userId, replyId);
         //if vote exists and is the same type return
@@ -139,7 +125,7 @@ exports.voteForumReply = async (req, res, next) => {
             const results = await replyService.voteForumReply(
                 user.userId,
                 replyId,
-                true);
+                voteData.type);
             if (results) {
                 logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
                 return res.status(200).json({  
@@ -179,7 +165,7 @@ exports.deleteForumReplyVote = async (req, res, next) => {
         //check if user has voted on this reply before
         const vote = await replyService.checkForVote(userData.userId, replyId);
         if (vote == null) {
-            next(new ApplicationError(`Vote by {userId: ${user.userId}} does not exist for {replyId: ${replyId}}`));
+            next(new ApplicationError(`Vote by {userId: ${userData.userId}} does not exist for {replyId: ${replyId}}`));
             return res.status(500).json({
                 "success": false,
                 "data": null,
@@ -188,7 +174,7 @@ exports.deleteForumReplyVote = async (req, res, next) => {
         }
         const results = await replyService.unvoteForumReply(vote, replyId);
         if (results) {
-            logger.info(`Successfully deleted vote: {voteId: ${results.voteId}} for {replyId: ${replyId}}`);
+            logger.info(`Successfully deleted vote: {voteId: ${vote.voteId}} for {replyId: ${replyId}}`);
             return res.status(200).json({  
                 "success": true,
                 "data": null,

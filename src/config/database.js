@@ -13,6 +13,7 @@ const Vote = require("../models/Vote");
 const Subject = require("../models/Subject");
 const Grade = require("../models/Grade");
 const File = require("../models/File");
+const Like = require("../models/Like");
 
 //Define Associations
 //post Table
@@ -87,6 +88,32 @@ sequelize.models.PostReply.hasMany(sequelize.models.Vote, {
     onDelete: "CASCADE"
 });
 sequelize.models.Vote.belongsTo(sequelize.models.PostReply, {
+    foreignKey: {
+        name: "parentId"
+    },
+    onDelete: "CASCADE"
+});
+
+//like Table
+sequelize.models.User.hasMany(sequelize.models.Like, {
+    foreignKey: {
+        name: "userId"
+    },
+    onDelete: "CASCADE"
+});
+sequelize.models.Like.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    },
+    onDelete: "CASCADE"
+});
+sequelize.models.Post.hasMany(sequelize.models.Like, {
+    foreignKey: {
+        name: "parentId"
+    },
+    onDelete: "CASCADE"
+});
+sequelize.models.Like.belongsTo(sequelize.models.Post, {
     foreignKey: {
         name: "parentId"
     },
