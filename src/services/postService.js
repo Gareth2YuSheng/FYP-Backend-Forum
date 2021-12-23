@@ -4,6 +4,7 @@ const cloudinaryService = require("./cloudinaryService");
 const fileService = require("../services/fileService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
+const { Op } = require("sequelize");
 
 exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
@@ -67,7 +68,7 @@ exports.getPostById = (postId) => {
     });
 } //End of getPostById
 
-exports.getPostDetailsById = (postId) => {
+exports.getPostDetailsById = (postId, userId) => {
     logger.info("getPostDetailsById running");
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
@@ -91,6 +92,10 @@ exports.getPostDetailsById = (postId) => {
                 }, {
                     attributes: ["firstName", "lastName", "profileImage"],
                     model: models.User
+                }, {
+                    model: models.Like,
+                    where: { userId: userId },
+                    required: false
                 }]
             });
             res(result);
@@ -100,19 +105,23 @@ exports.getPostDetailsById = (postId) => {
     });
 } //End of getPostDetailsById
 
-exports.getPosts = (count, page, subject, topic, grade) => { //send user data as well
+exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //send user data as well
     logger.info("getPosts running");
     const offset = (count*(page-1));
-    if (subject == null) subject = "";
-    if (topic == null) topic = "";
-    if (grade == null) grade = "";
     //get forum post with the postId provided
     return new Promise(async (res, rej) => {
         try {
             let whereOptions = {};
-            if (subject !== "") whereOptions.subjectId = subject;
-            if (topic !== "") whereOptions.topicId = topic;
-            if (grade !== "") whereOptions.gradeId = grade;
+            if (subject != null && subject !== "") whereOptions.subjectId = subject;
+            if (topic != null && topic !== "") whereOptions.topicId = topic;
+            if (grade != null && grade !== "") whereOptions.gradeId = grade;
+            if (search != null && search !== "") {
+                console.log(search.toLowerCase())
+                // whereOptions.title = {
+                //     [Op.like]: `%${search}%`
+                // };
+            }
+            logger.info("WHERE OPTIONS:", whereOptions)
             const posts = await models.Post.findAll({ 
                 limit: count, 
                 offset: offset,  
@@ -139,6 +148,10 @@ exports.getPosts = (count, page, subject, topic, grade) => { //send user data as
                 }, {
                     attributes: ["firstName", "lastName", "profileImage"],
                     model: models.User
+                }, {
+                    model: models.Like,
+                    where: { userId: userId },
+                    required: false
                 }]
             });   
             res(posts);

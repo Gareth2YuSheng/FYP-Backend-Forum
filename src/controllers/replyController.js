@@ -11,11 +11,9 @@ exports.getForumQuestionReplies = async (req, res, next) => {
     const { count, page, userId } = req.query;    
     try { //sanitize results later
         const replyCount = await replyService.getReplyCountForQuestion(questionId);
-        let replies, votes;
+        let replies = null;
         if (replyCount > 0) {
-            replies = await replyService.getReplies(questionId, count, page);
-            const replyIds = replies.map(reply => (reply.replyId));
-            votes = await replyService.getQuestionVotes(replyIds, userId);
+            replies = await replyService.getReplies(questionId, count, page, userId);
         } 
         //return response regardless of if there are replies or not
         logger.info(`Successfully retrieved replies: {count:${count}, page:${page}} for {postId: ${questionId}} with {replyCount: ${replyCount}}`);
@@ -23,9 +21,8 @@ exports.getForumQuestionReplies = async (req, res, next) => {
             "success": true,
             "data": {
                 replyCount: replyCount,
-                replies: replies,
-                votes: votes
-                },
+                replies
+            },
             "message": null 
         });
         
