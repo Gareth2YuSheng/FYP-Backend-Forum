@@ -4,11 +4,23 @@ const config = require("./config");
 const { logger } = require("../logger/logger");
 const { DatabaseConnectionError } = require("../errors/errors");
 
-const dbConnectionUrl = config.databaseUrl;
+const sequelizeOptions = {
+    host: config.rdsHostUrl,
+    port: config.rdsPortNum,
+    database: config.rdsDBName,
+    username: config.rdsDBUsername,
+    password: config.rdsDBPassword,
+    logging: msg => logger.info(msg),
+    maxConcurrentQueries: 100,
+    dialect: 'postgres',
+    // dialectOptions: {
+    //     ssl:'Amazon RDS'
+    // },
+    pool: { max: 100, idle: 300000 }, //5 mins
+    language: 'en'
+}
 
-const sequelize = new Sequelize(dbConnectionUrl, {
-    logging: msg => logger.info(msg),     // Use custom logger (e.g. Winston or Bunyan), displays the first parameter
-});
+const sequelize = new Sequelize(sequelizeOptions);
 
 sequelize.testConnection = async () => {
     try {
