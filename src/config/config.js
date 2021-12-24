@@ -12,6 +12,6 @@ module.exports = {
     rdsHostUrl: process.env.RDS_HOST,
     rdsPortNum: process.env.RDS_PORT,
     rdsDBName: process.env.RDS_DB_NAME,
-    rdsDBUsername: process.env.RDSDB_USERNAME,
+    rdsDBUsername: process.env.RDS_DB_USERNAME,
     rdsDBPassword: process.env.RDS_DB_PASSWORD
 };
