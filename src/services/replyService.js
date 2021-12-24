@@ -33,7 +33,7 @@ exports.getReplyById = (replyId) => {
     });
 }   //End of getReplyById
 
-exports.getReplies = (questionId, count, page) => { //send user data as well
+exports.getReplies = (questionId, count, page, userId) => { //send user data as well
     logger.info("getReplies running");
     const offset = (count*(page-1));
     //get replies for a post with the given postId
@@ -51,6 +51,10 @@ exports.getReplies = (questionId, count, page) => { //send user data as well
                 include: [{
                     attributes: ["firstName", "lastName", "profileImage"],
                     model: models.User
+                }, {
+                    model: models.Vote,
+                    where: { userId: userId },
+                    required: false
                 }]
             });                  
             res(replies);
@@ -171,16 +175,9 @@ exports.unvoteForumReply = (vote, replyId) => {
     return new Promise(async (res, rej) => {
         try{
             const increment = (vote.type) ? -1 : 1;
-            // const result = await models.Vote.destroy({
-            //     where: { 
-            //         parentId: parentId,
-            //         userId: userId
-            //     }
-            // });
             const result = await vote.destroy();
             //minus vote value from reply vote count
             const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: replyId } });
-            console.log(result)
             res("Vote deleted successfully");
         } catch (error) {
             rej(new DatabaseError(error.message));

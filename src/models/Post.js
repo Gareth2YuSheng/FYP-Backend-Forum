@@ -10,7 +10,7 @@ const Post = sequelize.define("Post", {
             primaryKey: true
         },
         title: {
-            type: DataTypes.STRING,
+            type: DataTypes.CITEXT,
             allowNull: false,
             validate: {
                 notEmpty: true
@@ -28,6 +28,15 @@ const Post = sequelize.define("Post", {
             allowNull: false,
             validate: {
                 notEmpty: true
+            }
+        },
+        likeCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                isInt: true
             }
         },
         //Foreign Keys
