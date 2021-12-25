@@ -43,11 +43,19 @@ class FileError extends ApplicationError {
     }
 }
 
+class URLError extends ApplicationError {
+    constructor(message) {
+        super(message);
+        Error.captureStackTrace(this);
+    }
+}
+
 module.exports = {
     ApplicationError,
     DatabaseError,
     DatabaseConnectionError,
     ValidationError,
     CloudinaryError,
-    FileError
+    FileError,
+    URLError
 };
