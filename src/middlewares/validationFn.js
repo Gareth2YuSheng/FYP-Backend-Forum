@@ -1,7 +1,7 @@
 //For input validation and output sanitization functions
 const validator = require("validator");
 const { logger } = require("../logger/logger");
-const { ValidationError } = require("../errors/errors");
+const { ValidationError, URLError } = require("../errors/errors");
 
 function objValidateEmptyOrNull(object) { //if Valid return true, Invalid return false
     if (object == null) return false;
@@ -493,7 +493,7 @@ const validationFn = {
     }, //End of validateUnlikeForumQuestion
 
     //sanitization function
-    sanitizeResult: function (req, res, next){
+    sanitizeResult: function(req, res, next){
         logger.info("sanitizeResult middleware called");
         // if (res.locals.data.data) {
         //     if (res.locals.data.data.fileData) {
@@ -519,8 +519,19 @@ const validationFn = {
         //             }
         //         }
         //     }
-        // }
-    } //End of sanitizeResult
+        // }        
+    }, //End of sanitizeResult
+
+    invalidURLPath: function(req, res, next) {
+        logger.info("invalidURLPath middleware called");
+        //return error if url path does not exist on this server
+        logger.error("", new URLError("Endpoint URL does not exist: "+req.url));
+        res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": "Server is unable to process the request. Invalid URL." 
+        });
+    } //End of invalidURLPath
 }
  
 module.exports = validationFn;
