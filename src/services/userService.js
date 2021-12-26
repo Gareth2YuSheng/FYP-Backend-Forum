@@ -3,36 +3,36 @@ const { logger } = require("../logger/logger");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
-exports.createUser = (firstName, lastName, email, password, roleId, userId=null) => {
-    logger.info("createUser running");
-    //create user with userId, if userId was provided in the function parameters
-    return new Promise(async (res, rej) => {
-        try {
-            let result;
-            if (userId) { //if userId was provided
-                result = await models.User.create({
-                    userId: userId,
-                    email: email,
-                    firstName: firstName,
-                    lastName: lastName,
-                    password: password,
-                    roleId: roleId
-                });
-            } else { //if userId was not provided
-                result = await models.User.create({
-                    email: email,
-                    firstName: firstName,
-                    lastName: lastName,
-                    password: password,
-                    roleId: roleId
-                });
-            }            
-            res(result);
-        } catch (error) {
-            rej(new DatabaseError(error.message));
-        }        
-    });
-} //End of createUser
+// exports.createUser = (firstName, lastName, email, password, roleId, userId=null) => {
+//     logger.info("createUser running");
+//     //create user with userId, if userId was provided in the function parameters
+//     return new Promise(async (res, rej) => {
+//         try {
+//             let result;
+//             if (userId) { //if userId was provided
+//                 result = await models.User.create({
+//                     userId: userId,
+//                     email: email,
+//                     firstName: firstName,
+//                     lastName: lastName,
+//                     password: password,
+//                     roleId: roleId
+//                 });
+//             } else { //if userId was not provided
+//                 result = await models.User.create({
+//                     email: email,
+//                     firstName: firstName,
+//                     lastName: lastName,
+//                     password: password,
+//                     roleId: roleId
+//                 });
+//             }            
+//             res(result);
+//         } catch (error) {
+//             rej(new DatabaseError(error.message));
+//         }        
+//     });
+// } //End of createUser
 
 exports.getUserByUserId = (userId) => {
     logger.info("getUserByUserId running");
@@ -56,10 +56,8 @@ exports.getIfNotCreateUser = (userData) => {
             const [user, created] = await models.User.findOrCreate({
                 where: { userId: userData.userId },
                 defaults: {
-                    email: userData.email,
                     firstName: userData.firstName,
                     lastName: userData.lastName,
-                    password: "password",
                     roleId: userData.roleId
                 }
             });

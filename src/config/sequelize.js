@@ -21,6 +21,7 @@ const sequelizeOptions = {
 }
 
 const sequelize = new Sequelize(sequelizeOptions);
+// const sequelize = new Sequelize("postgres://qpvhphyz:gQhkrMCspzamZ2ao7OSfLaJv38V2IpbZ@john.db.elephantsql.com/qpvhphyz");
 
 sequelize.testConnection = async () => {
     try {

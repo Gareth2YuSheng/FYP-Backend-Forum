@@ -1,4 +1,4 @@
-const { DatabaseError, CloudinaryError } = require("../errors/errors");
+const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const cloudinaryService = require("./cloudinaryService");
 const fileService = require("../services/fileService");
@@ -8,7 +8,7 @@ const { Op } = require("sequelize");
 
 exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
-    //create forumn post with the details provided
+    //create forum post with the details provided
     return new Promise(async (res, rej) => {
         try {
             //create post

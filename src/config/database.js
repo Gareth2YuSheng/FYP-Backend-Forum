@@ -14,6 +14,7 @@ const Subject = require("../models/Subject");
 const Grade = require("../models/Grade");
 const File = require("../models/File");
 const Like = require("../models/Like");
+const Request = require("../models/Request")
 
 //Define Associations
 //post Table
@@ -177,13 +178,56 @@ sequelize.models.Topic.hasMany(sequelize.models.TopicAssociation, {
 //fileTable
 sequelize.models.Post.hasMany(sequelize.models.File, {
     foreignKey: {
-        name: "parentId"
+        name: "postId"
     }
 });
 sequelize.models.File.belongsTo(sequelize.models.Post, {
     foreignKey: {
-        name: "parentId"
+        name: "postId"
     }
 });
+
+//request Table
+sequelize.models.Request.hasMany(sequelize.models.File, {
+    foreignKey: {
+        name: "requestId"
+    }
+});
+sequelize.models.File.belongsTo(sequelize.models.Request, {
+    foreignKey: {
+        name: "requestId"
+    }
+});
+sequelize.models.Topic.hasMany(sequelize.models.Request, {
+    foreignKey: {
+        name: "topicId"
+    }
+});
+sequelize.models.Request.belongsTo(sequelize.models.Topic, {
+    foreignKey: {
+        name: "topicId"
+    }
+});
+sequelize.models.User.hasMany(sequelize.models.Request, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.Request.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.User.hasMany(sequelize.models.Request, {
+    foreignKey: {
+        name: "tutorId"
+    }
+});
+sequelize.models.Request.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "tutorId"
+    }
+});
+
 
 module.exports = sequelize;
