@@ -30,6 +30,14 @@ const Request = sequelize.define("Request", {
                 notEmpty: true
             }
         },
+        accepted: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
+        },
         //Foreign Keys
         userId: {
             type: DataTypes.UUID,
