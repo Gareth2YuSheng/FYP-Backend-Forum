@@ -30,9 +30,9 @@ const Request = sequelize.define("Request", {
                 notEmpty: true
             }
         },
-        accepted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
+        status: {
+            type: DataTypes.STRING,
+            defaultValue: "PENDING",
             allowNull: false,
             validate: {
                 notEmpty: true
