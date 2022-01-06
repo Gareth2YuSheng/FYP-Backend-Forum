@@ -10,19 +10,20 @@ const Conversation = sequelize.define("Conversation", {
             primaryKey: true 
         },
         latestMsg: {
-            type: DataTypes.TEXT
+            type: DataTypes.STRING,
+            defaultValue: ""
         },
         title: {
-            type: DataTypes.TEXT
+            type: DataTypes.STRING,
+            defaultValue: ""
         },
         status: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            allowNull: false,
+            defaultValue: true
         }
     }, {
-        tableName: "conversation",
-        timestamps: true,
-        createdAt: false
+        tableName: "conversation"
     }
 );
 
