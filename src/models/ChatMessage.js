@@ -10,11 +10,7 @@ const ChatMessage = sequelize.define("ChatMessage", {
             primaryKey: true 
         },
         message: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
+            type: DataTypes.TEXT
         },
         //For images (allow null as not every message will have images)
         cloudinaryFileId: {
