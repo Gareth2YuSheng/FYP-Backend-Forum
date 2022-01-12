@@ -1,59 +1,66 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const File = sequelize.define("File", {
-        fileId: {
+const Request = sequelize.define("Request", {
+        requestId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             unique: true,
             primaryKey: true
         },
-        cloudinaryFileId: {
-            type: DataTypes.STRING,
+        title: {
+            type: DataTypes.CITEXT,
             allowNull: false,
             validate: {
-                notNull: true,
                 notEmpty: true
             }
         },
-        cloudinaryUrl: {
-            type: DataTypes.STRING,
+        content: {
+            type: DataTypes.TEXT,
             allowNull: false,
             validate: {
-                notNull: true,
                 notEmpty: true
             }
         },
-        fileName: {
+        objective: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                notNull: true,
                 notEmpty: true
             }
         },
-        mimeType: {
+        status: {
             type: DataTypes.STRING,
+            defaultValue: "PENDING",
             allowNull: false,
             validate: {
-                notNull: true,
                 notEmpty: true
             }
         },
         //Foreign Keys
-        postId: {
+        userId: {
             type: DataTypes.UUID,
-            allowNull: true
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         },
-        requestId: {
+        topicId: {
             type: DataTypes.UUID,
-            allowNull: true
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
         },
-    },{
-        tableName:"file",
-        timestamps: false
+        tutorId: {
+            type: DataTypes.UUID
+        },
+    }, {
+        tableName: "request",
+        timestamps: true,
+        updatedAt: false
     }
 );
 
-module.exports = File;
+module.exports = Request;

@@ -206,7 +206,7 @@ const validationFn = {
         }
         //Check for null userId
         else if (!objValidateEmptyOrNull(userData) || userData.userId == null) {
-            errorMsg = "Missing userId"
+            errorMsg = "Missing userId";
         }
         //Check for valid userId
         else if (!validateUUID(userData.userId)) {
@@ -303,7 +303,7 @@ const validationFn = {
         } 
         //Check if userData contains userId and replyData contains isAnswer
         else if (!userData.userId && replyData.isAnswer != null){
-            errorMsg = "Missing userId or isAnswer"
+            errorMsg = "Missing userId or isAnswer";
         }
         //Check if replyData.isAnswer is valid
         else if (replyData.isAnswer !== "true" && replyData.isAnswer !== "false") {

@@ -1,4 +1,4 @@
-const { DatabaseError, CloudinaryError } = require("../errors/errors");
+const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const cloudinaryService = require("./cloudinaryService");
 const fileService = require("../services/fileService");
@@ -8,7 +8,7 @@ const { Op } = require("sequelize");
 
 exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
-    //create forumn post with the details provided
+    //create forum post with the details provided
     return new Promise(async (res, rej) => {
         try {
             //create post
@@ -109,7 +109,7 @@ exports.getPostDetailsById = (postId, userId) => {
 exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //send user data as well
     logger.info("getPosts running");
     const offset = (count*(page-1));
-    //get forum post with the postId provided
+    //get forum posts
     return new Promise(async (res, rej) => {
         try {
             let whereOptions = {}, searchOptions = {};
