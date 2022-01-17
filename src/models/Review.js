@@ -1,35 +1,23 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const Post = sequelize.define("Post", {
-        postId: {
+const Review = sequelize.define("Review", {
+        reviewId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             unique: true,
             primaryKey: true
         },
-        title: {
-            type: DataTypes.CITEXT,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
+        review: {
+            type: DataTypes.TEXT
         },
-        content: {
-            type: DataTypes.TEXT,
+        rating: {
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
             validate: {
-                notEmpty: true
-            }
-        },
-        likeCount: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
-            allowNull: false,
-            validate: {
-                notNull: true,
-                isInt: true
+                notEmpty: true,
+                isDecimal:true
             }
         },
         //Foreign Keys
@@ -40,17 +28,18 @@ const Post = sequelize.define("Post", {
                 notNull: true
             }
         },
-        topicId: {
+        tutorId: {
             type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notNull: true
             }
-        }
+        },
     }, {
-        tableName: "post"
+        tableName: "review",
+        timestamps: true,
+        updatedAt: false
     }
 );
 
-
-module.exports = Post;
+module.exports = Review;

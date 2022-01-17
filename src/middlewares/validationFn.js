@@ -64,7 +64,7 @@ const validationFn = {
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
             errorMsg = "Missing questionData or missing userData";
-        } else if (!questionData.questionTitle || !questionData.questionContent || !questionData.questionObjective) {
+        } else if (!questionData.questionTitle || !questionData.questionContent) {
             errorMsg = "Missing data in questionData";
         } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";
@@ -206,7 +206,7 @@ const validationFn = {
         }
         //Check for null userId
         else if (!objValidateEmptyOrNull(userData) || userData.userId == null) {
-            errorMsg = "Missing userId"
+            errorMsg = "Missing userId";
         }
         //Check for valid userId
         else if (!validateUUID(userData.userId)) {
@@ -303,7 +303,7 @@ const validationFn = {
         } 
         //Check if userData contains userId and replyData contains isAnswer
         else if (!userData.userId && replyData.isAnswer != null){
-            errorMsg = "Missing userId or isAnswer"
+            errorMsg = "Missing userId or isAnswer";
         }
         //Check if replyData.isAnswer is valid
         else if (replyData.isAnswer !== "true" && replyData.isAnswer !== "false") {

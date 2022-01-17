@@ -118,9 +118,8 @@ exports.createForumQuestion = async (req, res, next) => {
         //Create the Post
         const results = await postService.createPost(
             questionData.questionTitle, 
-            questionData.questionContent, 
-            questionData.questionObjective,
-            user.userId, //userId to later be retrieved from JWT token
+            questionData.questionContent,
+            user.userId,
             topic.topicId,
             files,
             base64Files);
@@ -192,7 +191,6 @@ exports.editForumQuestionDetails = async (req, res, next) => {
         const results = await postService.editPost(
             questionData.questionTitle,
             questionData.questionContent,
-            questionData.questionObjective,
             topicId,
             post
         );

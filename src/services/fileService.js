@@ -15,7 +15,7 @@ exports.createFile = (cloudinaryFileId, cloudinaryUrl, fileName, mimeType, paren
                 cloudinaryUrl: cloudinaryUrl,
                 fileName: fileName,
                 mimeType: mimeType,
-                parentId: parentId
+                postId: parentId
             });
             res(file);
         } catch (error) {
@@ -32,7 +32,7 @@ exports.getFilesForParent = (parentId) => {
             //create file record in DB
             const files = await models.File.findAll({
                 where: {
-                    parentId: parentId
+                    postId: parentId
                 }
             });
             res(files);

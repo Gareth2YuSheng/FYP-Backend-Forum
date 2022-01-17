@@ -1,4 +1,4 @@
-const { DatabaseError, CloudinaryError } = require("../errors/errors");
+const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const cloudinaryService = require("./cloudinaryService");
 const fileService = require("../services/fileService");
@@ -6,9 +6,9 @@ const sequelize = require("../config/database");
 const models = sequelize.models;
 const { Op } = require("sequelize");
 
-exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
+exports.createPost = (title, content, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
-    //create forumn post with the details provided
+    //create forum post with the details provided
     return new Promise(async (res, rej) => {
         try {
             //create post
@@ -16,8 +16,7 @@ exports.createPost = (title, content, objective, userId, topicId, files, filesBa
                 title: title,
                 content: content,
                 topicId: topicId,
-                userId: userId,
-                objective: objective
+                userId: userId
             });
             //upload files to cloudinary and store filedata in DB
             if (files.length > 0) { //from multer
@@ -109,7 +108,7 @@ exports.getPostDetailsById = (postId, userId) => {
 exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //send user data as well
     logger.info("getPosts running");
     const offset = (count*(page-1));
-    //get forum post with the postId provided
+    //get forum posts
     return new Promise(async (res, rej) => {
         try {
             let whereOptions = {}, searchOptions = {};
@@ -164,7 +163,7 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
     });
 } //End of getPosts
 
-exports.editPost = (title, content, objective, topicId, post) => {
+exports.editPost = (title, content, topicId, post) => {
     logger.info("editPost running");
     //update forum post instance with the details provided
     return new Promise(async (res, rej) => {
@@ -173,7 +172,6 @@ exports.editPost = (title, content, objective, topicId, post) => {
             post.set({
                 title: title,
                 content: content,
-                objective: objective,
                 topicId: topicId
             });
             //save the changes to the DB

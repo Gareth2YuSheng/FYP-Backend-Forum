@@ -22,9 +22,6 @@ async function resetTables() {
     models.Role.create({
         roleName: "TUTOR"
     });
-    models.Role.create({
-        roleName: "PARENT"
-    });
 }
 
 resetTables();
