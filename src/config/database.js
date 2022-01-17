@@ -19,6 +19,7 @@ const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
 const ChatMessage = require("../models/ChatMessage");
 const ConversationMember = require("../models/ConversationMember");
+const Review = require("../models/Review");
 
 
 //Define Associations

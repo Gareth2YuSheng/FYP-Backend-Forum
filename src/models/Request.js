@@ -23,13 +23,6 @@ const Request = sequelize.define("Request", {
                 notEmpty: true
             }
         },
-        objective: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
         status: {
             type: DataTypes.STRING,
             defaultValue: "PENDING",
