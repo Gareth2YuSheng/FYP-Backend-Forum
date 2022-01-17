@@ -14,7 +14,13 @@ const Subject = require("../models/Subject");
 const Grade = require("../models/Grade");
 const File = require("../models/File");
 const Like = require("../models/Like");
-const Request = require("../models/Request")
+const Request = require("../models/Request");
+const Comment = require("../models/Comment");
+const Conversation = require("../models/Conversation");
+const ChatMessage = require("../models/ChatMessage");
+const ConversationMember = require("../models/ConversationMember");
+const Review = require("../models/Review");
+
 
 //Define Associations
 //post Table
@@ -229,5 +235,102 @@ sequelize.models.Request.belongsTo(sequelize.models.User, {
     }
 });
 
+//comment Table
+sequelize.models.User.hasMany(sequelize.models.Comment, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.Comment.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.Post.hasMany(sequelize.models.Comment, {
+    foreignKey: {
+        name: "postId"
+    }
+});
+sequelize.models.Comment.belongsTo(sequelize.models.Post, {
+    foreignKey: {
+        name: "postId"
+    }
+});
+sequelize.models.PostReply.hasMany(sequelize.models.Comment, {
+    foreignKey: {
+        name: "replyId"
+    }
+});
+sequelize.models.Comment.belongsTo(sequelize.models.PostReply, {
+    foreignKey: {
+        name: "replyId"
+    }
+});
+
+//chatMessage Table
+sequelize.models.User.hasMany(sequelize.models.ChatMessage, {
+    foreignKey: {
+        name: "senderId"
+    }
+});
+sequelize.models.ChatMessage.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "senderId"
+    }
+});
+sequelize.models.Conversation.hasMany(sequelize.models.ChatMessage, {
+    foreignKey: {
+        name: "conversationId"
+    }
+});
+sequelize.models.ChatMessage.belongsTo(sequelize.models.Conversation, {
+    foreignKey: {
+        name: "conversationId"
+    }
+});
+
+//conversationMember Table
+sequelize.models.User.hasMany(sequelize.models.ConversationMember, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.ConversationMember.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.Conversation.hasMany(sequelize.models.ConversationMember, {
+    foreignKey: {
+        name: "conversationId"
+    }
+});
+sequelize.models.ConversationMember.belongsTo(sequelize.models.Conversation, {
+    foreignKey: {
+        name: "conversationId"
+    }
+});
+
+//review Table
+sequelize.models.User.hasMany(sequelize.models.Review, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.Review.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.User.hasMany(sequelize.models.Review, {
+    foreignKey: {
+        name: "tutorId"
+    }
+});
+sequelize.models.Review.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "tutorId"
+    }
+});
 
 module.exports = sequelize;

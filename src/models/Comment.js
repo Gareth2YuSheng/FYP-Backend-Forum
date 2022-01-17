@@ -1,31 +1,16 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const Request = sequelize.define("Request", {
-        requestId: {
+const Comment = sequelize.define("Comment", {
+        commentId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             unique: true,
             primaryKey: true
         },
-        title: {
-            type: DataTypes.CITEXT,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
         content: {
             type: DataTypes.TEXT,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
-        status: {
-            type: DataTypes.STRING,
-            defaultValue: "PENDING",
             allowNull: false,
             validate: {
                 notEmpty: true
@@ -39,21 +24,23 @@ const Request = sequelize.define("Request", {
                 notNull: true
             }
         },
-        topicId: {
+        postId: {
             type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 notNull: true
             }
         },
-        tutorId: {
-            type: DataTypes.UUID
-        },
+        replyId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            validate: {
+                notNull: true
+            }
+        }
     }, {
-        tableName: "request",
-        timestamps: true,
-        updatedAt: false
+        tableName: "comment"
     }
 );
 
-module.exports = Request;
+module.exports = Comment;

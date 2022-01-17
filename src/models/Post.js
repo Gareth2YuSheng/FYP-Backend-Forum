@@ -23,13 +23,6 @@ const Post = sequelize.define("Post", {
                 notEmpty: true
             }
         },
-        objective: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: true
-            }
-        },
         likeCount: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
