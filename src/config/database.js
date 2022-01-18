@@ -90,13 +90,25 @@ sequelize.models.Vote.belongsTo(sequelize.models.User, {
 });
 sequelize.models.PostReply.hasMany(sequelize.models.Vote, {
     foreignKey: {
-        name: "parentId"
+        name: "replyId"
     },
     onDelete: "CASCADE"
 });
 sequelize.models.Vote.belongsTo(sequelize.models.PostReply, {
     foreignKey: {
-        name: "parentId"
+        name: "replyId"
+    },
+    onDelete: "CASCADE"
+});
+sequelize.models.Post.hasMany(sequelize.models.Vote, {
+    foreignKey: {
+        name: "postId"
+    },
+    onDelete: "CASCADE"
+});
+sequelize.models.Vote.belongsTo(sequelize.models.Post, {
+    foreignKey: {
+        name: "postId"
     },
     onDelete: "CASCADE"
 });
