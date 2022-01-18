@@ -24,12 +24,11 @@ const Vote = sequelize.define("Vote", {
                 notNull: true
             }
         },
-        parentId: {
-            type: DataTypes.UUID,
-            allowNull: false,
-            validate: {
-                notNull: true
-            }
+        postId: {
+            type: DataTypes.UUID
+        },
+        replyId: {
+            type: DataTypes.UUID
         }
     }, {
         tableName: "vote",

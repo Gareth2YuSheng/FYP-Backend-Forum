@@ -42,22 +42,21 @@ exports.appRoute = router => {
     router.get(urlPrefix + "/question/subject/count", verifyFn.verifyToken, questionController.getForumQuestionCountBySubject);
 
     //POST
-    // router.post("/login", authController.login);
-    // router.post("/register", authController.register);
     router.post(urlPrefix + "/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post(urlPrefix + "/reply/:q_id/create", verifyFn.verifyToken, validationFn.validateCreateForumReply, replyController.createForumReply);
     
     //PUT
     router.put(urlPrefix + "/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);
-    router.put(urlPrefix + "/question/:p_id/like", verifyFn.verifyToken, validationFn.validateLikeForumQuestion, questionController.likeForumQuestion);
+    // router.put(urlPrefix + "/question/:p_id/like", verifyFn.verifyToken, validationFn.validateLikeForumQuestion, questionController.likeForumQuestion);
     router.put(urlPrefix + "/reply/:r_id/edit", verifyFn.verifyToken, validationFn.validateEditForumReply, replyController.editForumReply);
     router.put(urlPrefix + "/reply/:r_id/correct", verifyFn.verifyToken, validationFn.validateMarkReplyAsAnswer, replyController.markForumReplyAsCorrectAnswer);
     router.put(urlPrefix + "/reply/:r_id/vote", verifyFn.verifyToken, validationFn.validateVoteForumReply, replyController.voteForumReply);
 
     //DELETE
     router.delete(urlPrefix + "/question/:q_id/delete", verifyFn.verifyToken, validationFn.validateDeleteForumQuestion, questionController.deleteForumQuestion);
-    router.delete(urlPrefix + "/question/:p_id/like", verifyFn.verifyToken, validationFn.validateUnlikeForumQuestion, questionController.unlikeForumQuestion);
+    // router.delete(urlPrefix + "/question/:p_id/like", verifyFn.verifyToken, validationFn.validateUnlikeForumQuestion, questionController.unlikeForumQuestion);
     router.delete(urlPrefix + "/reply/:r_id/vote", verifyFn.verifyToken, validationFn.validateDeleteVoteForumReply, replyController.deleteForumReplyVote);
+    router.delete(urlPrefix + "/reply/:r_id/delete", verifyFn.verifyToken, validationFn.validateDeleteForumReply, replyController.deleteForumPostReply);
 
     //sanitization function
     //router.use(validationFn.sanitizeResult); 
