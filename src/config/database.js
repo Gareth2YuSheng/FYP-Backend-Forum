@@ -19,6 +19,7 @@ const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
 const ChatMessage = require("../models/ChatMessage");
 const ConversationMember = require("../models/ConversationMember");
+const Review = require("../models/Review");
 
 
 //Define Associations
@@ -310,5 +311,26 @@ sequelize.models.ConversationMember.belongsTo(sequelize.models.Conversation, {
     }
 });
 
+//review Table
+sequelize.models.User.hasMany(sequelize.models.Review, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.Review.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.User.hasMany(sequelize.models.Review, {
+    foreignKey: {
+        name: "tutorId"
+    }
+});
+sequelize.models.Review.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "tutorId"
+    }
+});
 
 module.exports = sequelize;

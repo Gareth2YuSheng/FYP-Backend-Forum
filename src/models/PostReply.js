@@ -33,6 +33,12 @@ const PostReply = sequelize.define("PostReply", {
                 isInt: true
             }
         },
+        rating: {
+            type: DataTypes.DECIMAL(10, 2),
+            validate: {
+                isDecimal:true
+            }
+        },
         //Foreign Keys
         userId: {
             type: DataTypes.UUID,

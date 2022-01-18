@@ -23,14 +23,34 @@ const Post = sequelize.define("Post", {
                 notEmpty: true
             }
         },
-        objective: {
-            type: DataTypes.STRING,
+        // likeCount: {
+        //     type: DataTypes.INTEGER,
+        //     defaultValue: 0,
+        //     allowNull: false,
+        //     validate: {
+        //         notNull: true,
+        //         isInt: true
+        //     }
+        // },
+        voteCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
             allowNull: false,
             validate: {
-                notEmpty: true
+                notNull: true,
+                isInt: true
             }
         },
-        likeCount: {
+        answerCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                isInt: true
+            }
+        },
+        replyCount: {
             type: DataTypes.INTEGER,
             defaultValue: 0,
             allowNull: false,

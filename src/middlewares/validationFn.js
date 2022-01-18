@@ -64,7 +64,7 @@ const validationFn = {
         //Null or empty check
         if (!objValidateEmptyOrNull(questionData) || !objValidateEmptyOrNull(userData)) {
             errorMsg = "Missing questionData or missing userData";
-        } else if (!questionData.questionTitle || !questionData.questionContent || !questionData.questionObjective) {
+        } else if (!questionData.questionTitle || !questionData.questionContent) {
             errorMsg = "Missing data in questionData";
         } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
             errorMsg = "Missing data in userData";

@@ -6,7 +6,7 @@ const sequelize = require("../config/database");
 const models = sequelize.models;
 const { Op } = require("sequelize");
 
-exports.createPost = (title, content, objective, userId, topicId, files, filesBase64) => {
+exports.createPost = (title, content, userId, topicId, files, filesBase64) => {
     logger.info("createPost running");
     //create forum post with the details provided
     return new Promise(async (res, rej) => {
@@ -16,8 +16,7 @@ exports.createPost = (title, content, objective, userId, topicId, files, filesBa
                 title: title,
                 content: content,
                 topicId: topicId,
-                userId: userId,
-                objective: objective
+                userId: userId
             });
             //upload files to cloudinary and store filedata in DB
             if (files.length > 0) { //from multer
@@ -164,7 +163,7 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
     });
 } //End of getPosts
 
-exports.editPost = (title, content, objective, topicId, post) => {
+exports.editPost = (title, content, topicId, post) => {
     logger.info("editPost running");
     //update forum post instance with the details provided
     return new Promise(async (res, rej) => {
@@ -173,7 +172,6 @@ exports.editPost = (title, content, objective, topicId, post) => {
             post.set({
                 title: title,
                 content: content,
-                objective: objective,
                 topicId: topicId
             });
             //save the changes to the DB
@@ -210,94 +208,120 @@ exports.deletePost = (postId) => {
     });
 } //End of deletePost
 
-exports.likeForumQuestion = (userId, parentId, type) => {
-    logger.info("likeForumQuestion running");
+exports.incrementPostAnswerCount = (postId, increment) => {
+    logger.info("incrementPostAnswerCount running");
     //update forum post likeCount, and create like record in DB
     return new Promise(async (res, rej) => {
         try{
-            const result = await models.Like.create({
-                type: type,
-                userId: userId,
-                parentId: parentId
-            });
-            const increment = (type) ? 1 : -1;
-            const likeResult = await models.Post.increment({likeCount: increment}, { where: { postId: parentId } });
+            const result = await models.Post.increment({ answerCount: increment }, { where: { postId: postId } });
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
         }
-    })
-} //End of likeForumQuestion
+    });
+} //End of incrementPostAnswerCount
 
-exports.checkForLike = (userId, parentId) => {
-    logger.info("checkForLike running");
-    //check if user has already liked for forum post  
+exports.incrementPostReplyCount = (postId, increment) => {
+    logger.info("incrementPostReplyCount running");
+    //update forum post likeCount, and create like record in DB
     return new Promise(async (res, rej) => {
         try{
-            const result = await models.Like.findOne({
-                where: { 
-                    parentId: parentId,
-                    userId: userId
-                }
-            });
+            const result = await models.Post.increment({ replyCount: increment }, { where: { postId: postId } });
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
         }
-    })
-} //End of checkForLike
-
-exports.unlikeForumQuestion = (like, postId) => {
-    logger.info("unlikeForumQuestion running");
-    //delete user's like for a forum post 
-    return new Promise(async (res, rej) => {
-        try{
-            const increment = (like.type) ? -1 : 1;
-            const result = await like.destroy();
-            //minus like value from post like count
-            const likeResult = await models.Post.increment({likeCount: increment}, { where: { postId: postId } });
-            res("Like deleted successfully");
-        } catch (error) {
-            rej(new DatabaseError(error.message));
-        }
-    })
-} //End of unlikeForumQuestion
-
-exports.getLikesForPosts = (userId, posts) => { //send user data as well
-    logger.info("getLikesForPosts running");
-    //get likes for the provided post Ids made by a single user with provided userId
-    return new Promise(async (res, rej) => {
-        try {
-            const postIds = posts.map(post => (post.postId));
-            const likes = await models.Like.findAll({
-                attributes: ["likeId", "type", "parentId"],
-                where: {
-                    parentId: postIds,
-                    userId: userId
-                }
-            });
-            res(likes);
-        } catch (error) {
-            rej(new DatabaseError(error.message));
-        }        
     });
-} //End of getLikesForPosts
+} //End of incrementPostReplyCount
 
-exports.getLikesForPost = (userId, postId) => { //send user data as well
-    logger.info("getLikesForPost running");
-    //get likes for the provided postId made by a single user with provided userId
-    return new Promise(async (res, rej) => {
-        try {
-            const like = await models.Like.findOne({
-                attributes: ["likeId", "type"],
-                where: {
-                    parentId: postId,
-                    userId: userId
-                }
-            });
-            res(like);
-        } catch (error) {
-            rej(new DatabaseError(error.message));
-        }        
-    });
-} //End of getLikesForPost
+// exports.likeForumQuestion = (userId, parentId, type) => {
+//     logger.info("likeForumQuestion running");
+//     //update forum post likeCount, and create like record in DB
+//     return new Promise(async (res, rej) => {
+//         try{
+//             const result = await models.Like.create({
+//                 type: type,
+//                 userId: userId,
+//                 parentId: parentId
+//             });
+//             const increment = (type) ? 1 : -1;
+//             const likeResult = await models.Post.increment({likeCount: increment}, { where: { postId: parentId } });
+//             res(result);
+//         } catch (error) {
+//             rej(new DatabaseError(error.message));
+//         }
+//     })
+// } //End of likeForumQuestion
+
+// exports.checkForLike = (userId, parentId) => {
+//     logger.info("checkForLike running");
+//     //check if user has already liked for forum post  
+//     return new Promise(async (res, rej) => {
+//         try{
+//             const result = await models.Like.findOne({
+//                 where: { 
+//                     parentId: parentId,
+//                     userId: userId
+//                 }
+//             });
+//             res(result);
+//         } catch (error) {
+//             rej(new DatabaseError(error.message));
+//         }
+//     })
+// } //End of checkForLike
+
+// exports.unlikeForumQuestion = (like, postId) => {
+//     logger.info("unlikeForumQuestion running");
+//     //delete user's like for a forum post 
+//     return new Promise(async (res, rej) => {
+//         try{
+//             const increment = (like.type) ? -1 : 1;
+//             const result = await like.destroy();
+//             //minus like value from post like count
+//             const likeResult = await models.Post.increment({likeCount: increment}, { where: { postId: postId } });
+//             res("Like deleted successfully");
+//         } catch (error) {
+//             rej(new DatabaseError(error.message));
+//         }
+//     })
+// } //End of unlikeForumQuestion
+
+// exports.getLikesForPosts = (userId, posts) => { //send user data as well
+//     logger.info("getLikesForPosts running");
+//     //get likes for the provided post Ids made by a single user with provided userId
+//     return new Promise(async (res, rej) => {
+//         try {
+//             const postIds = posts.map(post => (post.postId));
+//             const likes = await models.Like.findAll({
+//                 attributes: ["likeId", "type", "parentId"],
+//                 where: {
+//                     parentId: postIds,
+//                     userId: userId
+//                 }
+//             });
+//             res(likes);
+//         } catch (error) {
+//             rej(new DatabaseError(error.message));
+//         }        
+//     });
+// } //End of getLikesForPosts
+
+// exports.getLikesForPost = (userId, postId) => { //send user data as well
+//     logger.info("getLikesForPost running");
+//     //get likes for the provided postId made by a single user with provided userId
+//     return new Promise(async (res, rej) => {
+//         try {
+//             const like = await models.Like.findOne({
+//                 attributes: ["likeId", "type"],
+//                 where: {
+//                     parentId: postId,
+//                     userId: userId
+//                 }
+//             });
+//             res(like);
+//         } catch (error) {
+//             rej(new DatabaseError(error.message));
+//         }        
+//     });
+// } //End of getLikesForPost
