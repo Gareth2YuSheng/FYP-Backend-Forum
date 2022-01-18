@@ -264,98 +264,98 @@ exports.deleteForumQuestion = async (req, res, next) => {
     }
 }; //End of deleteForumQuestion
 
-exports.likeForumQuestion = async (req, res, next) => {
-    logger.info("likeForumQuestion running");
-    const postId = req.params.p_id;
-    const userData = req.body.userData;
-    const likeData = req.body.likeData;
-    likeData.type = likeData.type === "up";
-    try {        
-        //Make sure there is a user with the userId before liking post
-        const user = await userService.getIfNotCreateUser(userData);
-        //check if user has liked this post before
-        const like = await postService.checkForLike(userData.userId, postId);
-        // if like exists and is the same type return
-        if (like && like.type == likeData.type) {
-            logger.info(`Like: {likeId: ${like.likeId}} for {postId: ${postId}} by {userId: ${userData.userId}} already exists`);
-            return res.status(200).json({  
-                "success": true,
-                "data": {
-                    likeId: like.likeId
-                },
-                "message": "User has already liked this post."
-            });
-        } 
-        //else if like doesnt exist create it
-        else {
-            //Create vote record and update reply voteCount
-            const results = await postService.likeForumQuestion(
-                user.userId,
-                postId,
-                likeData.type);
-            if (results) {
-                logger.info(`Successfully created like: {likeId: ${results.likeId}} for {postId: ${postId}}`);
-                return res.status(200).json({  
-                    "success": true,
-                    "data": {
-                        likeId: results.likeId
-                    },
-                    "message": "Like Created Successfully."
-                });
-            }
-        }
-    } catch (error) {
-        let errMsg = "Server is unable to process the request.";
-        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else {
-            if (error.message === "insert or update on table \"like\" violates foreign key constraint \"like_parentId_fkey\"") {
-                errMsg = "Post does not exist.";
-            }
-            next(error);
-        } 
-        //response to be standardised for each request
-        return res.status(500).json({  
-            "success": false,
-            "data": null,
-            "message": errMsg
-        });
-    }
-}; //End of likeForumQuestion
+// exports.likeForumQuestion = async (req, res, next) => {
+//     logger.info("likeForumQuestion running");
+//     const postId = req.params.p_id;
+//     const userData = req.body.userData;
+//     const likeData = req.body.likeData;
+//     likeData.type = likeData.type === "up";
+//     try {        
+//         //Make sure there is a user with the userId before liking post
+//         const user = await userService.getIfNotCreateUser(userData);
+//         //check if user has liked this post before
+//         const like = await postService.checkForLike(userData.userId, postId);
+//         // if like exists and is the same type return
+//         if (like && like.type == likeData.type) {
+//             logger.info(`Like: {likeId: ${like.likeId}} for {postId: ${postId}} by {userId: ${userData.userId}} already exists`);
+//             return res.status(200).json({  
+//                 "success": true,
+//                 "data": {
+//                     likeId: like.likeId
+//                 },
+//                 "message": "User has already liked this post."
+//             });
+//         } 
+//         //else if like doesnt exist create it
+//         else {
+//             //Create vote record and update reply voteCount
+//             const results = await postService.likeForumQuestion(
+//                 user.userId,
+//                 postId,
+//                 likeData.type);
+//             if (results) {
+//                 logger.info(`Successfully created like: {likeId: ${results.likeId}} for {postId: ${postId}}`);
+//                 return res.status(200).json({  
+//                     "success": true,
+//                     "data": {
+//                         likeId: results.likeId
+//                     },
+//                     "message": "Like Created Successfully."
+//                 });
+//             }
+//         }
+//     } catch (error) {
+//         let errMsg = "Server is unable to process the request.";
+//         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+//         else {
+//             if (error.message === "insert or update on table \"like\" violates foreign key constraint \"like_parentId_fkey\"") {
+//                 errMsg = "Post does not exist.";
+//             }
+//             next(error);
+//         } 
+//         //response to be standardised for each request
+//         return res.status(500).json({  
+//             "success": false,
+//             "data": null,
+//             "message": errMsg
+//         });
+//     }
+// }; //End of likeForumQuestion
 
-exports.unlikeForumQuestion = async (req, res, next) => {
-    logger.info("unlikeForumQuestion running");
-    const postId = req.params.p_id;
-    const userData = req.body.userData;
-    try {        
-        //Make sure there is a user with the userId before unvoting reply
-        // const user = await userService.getIfNotCreateUser(userData);
-        //check if user has like this post before
-        const like = await postService.checkForLike(userData.userId, postId);
-        if (like == null) {
-            next(new ApplicationError(`Like by {userId: ${userData.userId}} does not exist for {postId: ${postId}}`));
-            return res.status(500).json({
-                "success": false,
-                "data": null,
-                "message": "Like does not exist."
-            });
-        }
-        const results = await postService.unlikeForumQuestion(like, postId);
-        if (results) {
-            logger.info(`Successfully deleted like: {likeId: ${like.likeId}} for {postId: ${postId}}`);
-            return res.status(200).json({  
-                "success": true,
-                "data": null,
-                "message": "Like Deleted Successfully."
-            });
-        }        
-    } catch (error) {
-        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
-        else next(error);
-        //response to be standardised for each request
-        return res.status(500).json({  
-            "success": false,
-            "data": null,
-            "message": "Server is unable to process the request." 
-        });
-    }
-}; //End of unlikeForumQuestion
+// exports.unlikeForumQuestion = async (req, res, next) => {
+//     logger.info("unlikeForumQuestion running");
+//     const postId = req.params.p_id;
+//     const userData = req.body.userData;
+//     try {        
+//         //Make sure there is a user with the userId before unvoting reply
+//         // const user = await userService.getIfNotCreateUser(userData);
+//         //check if user has like this post before
+//         const like = await postService.checkForLike(userData.userId, postId);
+//         if (like == null) {
+//             next(new ApplicationError(`Like by {userId: ${userData.userId}} does not exist for {postId: ${postId}}`));
+//             return res.status(500).json({
+//                 "success": false,
+//                 "data": null,
+//                 "message": "Like does not exist."
+//             });
+//         }
+//         const results = await postService.unlikeForumQuestion(like, postId);
+//         if (results) {
+//             logger.info(`Successfully deleted like: {likeId: ${like.likeId}} for {postId: ${postId}}`);
+//             return res.status(200).json({  
+//                 "success": true,
+//                 "data": null,
+//                 "message": "Like Deleted Successfully."
+//             });
+//         }        
+//     } catch (error) {
+//         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+//         else next(error);
+//         //response to be standardised for each request
+//         return res.status(500).json({  
+//             "success": false,
+//             "data": null,
+//             "message": "Server is unable to process the request." 
+//         });
+//     }
+// }; //End of unlikeForumQuestion

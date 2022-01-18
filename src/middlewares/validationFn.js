@@ -492,6 +492,36 @@ const validationFn = {
         }
     }, //End of validateUnlikeForumQuestion
 
+    validateDeleteForumReply: function(req, res, next) {
+        logger.info("validateDeleteForumReply middleware called");
+        let errorMsg = "";
+        const replyId = req.params.r_id;
+        const userData = req.body.userData;
+        //Check for valid questionId 
+        if (!validateUUID(replyId)) {
+            errorMsg = "Invalid replyId";
+        }
+        //Check for null userId
+        else if (!objValidateEmptyOrNull(userData) || userData.userId == null) {
+            errorMsg = "Missing userId";
+        }
+        //Check for valid userId
+        else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userData";
+        }
+
+        if (errorMsg === "") {
+            next();
+        } else {
+            logger.error("", new ValidationError("validateDeleteForumReply Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateDeleteForumReply
+
     //sanitization function
     sanitizeResult: function(req, res, next){
         logger.info("sanitizeResult middleware called");
