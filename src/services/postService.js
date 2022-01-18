@@ -75,28 +75,31 @@ exports.getPostDetailsById = (postId, userId) => {
             const result = await models.Post.findOne({
                 where: { postId: postId },
                 order: [[models.File, "fileId", "DESC"]],
-                include: [{
-                    attributes: ["fileId","cloudinaryUrl"],
-                    model: models.File,
-                    required: false
-                }, {
-                    attributes: ["topicName", "subjectId", "gradeId"],
-                    model: models.Topic,               
-                    include: [{
-                        attributes: ["subjectName"],
-                        model: models.Subject
+                include: [
+                    {
+                        attributes: ["fileId","cloudinaryUrl"],
+                        model: models.File,
+                        required: false
                     }, {
-                        attributes: ["gradeName"],
-                        model: models.Grade
-                    }]
-                }, {
-                    attributes: ["firstName", "lastName", "profileImage"],
-                    model: models.User
-                }, {
-                    model: models.Like,
-                    where: { userId: userId },
-                    required: false
-                }]
+                        attributes: ["topicName", "subjectId", "gradeId"],
+                        model: models.Topic,               
+                        include: [{
+                            attributes: ["subjectName"],
+                            model: models.Subject
+                        }, {
+                            attributes: ["gradeName"],
+                            model: models.Grade
+                        }]
+                    }, {
+                        attributes: ["firstName", "lastName", "profileImage"],
+                        model: models.User
+                    },
+                    // {
+                    //     model: models.Like,
+                    //     where: { userId: userId },
+                    //     required: false
+                    // }
+                ]
             });
             res(result);
         } catch (error) {
@@ -131,30 +134,32 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
                 ],         
                 where: searchOptions,      
                 include: [
-                {
-                    attributes: ["fileId","cloudinaryUrl"],
-                    model: models.File,
-                    required: false
-                },
-                {
-                    attributes: ["topicName", "subjectId", "gradeId"],
-                    model: models.Topic,      
-                    where: whereOptions,                  
-                    include: [{
-                        attributes: ["subjectName"],
-                        model: models.Subject
+                    {
+                        attributes: ["fileId","cloudinaryUrl"],
+                        model: models.File,
+                        required: false
+                    },
+                    {
+                        attributes: ["topicName", "subjectId", "gradeId"],
+                        model: models.Topic,      
+                        where: whereOptions,                  
+                        include: [{
+                            attributes: ["subjectName"],
+                            model: models.Subject
+                        }, {
+                            attributes: ["gradeName"],
+                            model: models.Grade
+                        }]
                     }, {
-                        attributes: ["gradeName"],
-                        model: models.Grade
-                    }]
-                }, {
-                    attributes: ["firstName", "lastName", "profileImage"],
-                    model: models.User
-                }, {
-                    model: models.Like,
-                    where: { userId: userId },
-                    required: false
-                }]
+                        attributes: ["firstName", "lastName", "profileImage"],
+                        model: models.User
+                    }, 
+                    // {
+                    //     model: models.Like,
+                    //     where: { userId: userId },
+                    //     required: false
+                    // }
+                ]
             });   
             res(posts);
         } catch (error) {
@@ -210,7 +215,7 @@ exports.deletePost = (postId) => {
 
 exports.incrementPostAnswerCount = (postId, increment) => {
     logger.info("incrementPostAnswerCount running");
-    //update forum post likeCount, and create like record in DB
+    //update forum post answerCount
     return new Promise(async (res, rej) => {
         try{
             const result = await models.Post.increment({ answerCount: increment }, { where: { postId: postId } });
@@ -223,7 +228,7 @@ exports.incrementPostAnswerCount = (postId, increment) => {
 
 exports.incrementPostReplyCount = (postId, increment) => {
     logger.info("incrementPostReplyCount running");
-    //update forum post likeCount, and create like record in DB
+    //update forum post replyCoun
     return new Promise(async (res, rej) => {
         try{
             const result = await models.Post.increment({ replyCount: increment }, { where: { postId: postId } });
