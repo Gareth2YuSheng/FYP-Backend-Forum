@@ -93,7 +93,7 @@ exports.voteForumReply = async (req, res, next) => {
         //Make sure there is a user with the userId before upvoting reply
         const user = await userService.getIfNotCreateUser(userData);
         //check if user has voted on this reply before
-        const vote = await replyService.checkForVote(userData.userId, replyId);
+        const vote = await replyService.checkForVoteForReply(userData.userId, replyId);
         //if vote exists and is the same type return
         if (vote && vote.type == voteData.type) {
             logger.info(`Vote: {voteId: ${vote.voteId}} for {replyId: ${replyId}} by {userId: ${userData.userId}} already exists`);
@@ -163,7 +163,7 @@ exports.deleteForumReplyVote = async (req, res, next) => {
         //Make sure there is a user with the userId before unvoting reply
         // const user = await userService.getIfNotCreateUser(userData);
         //check if user has voted on this reply before
-        const vote = await replyService.checkForVote(userData.userId, replyId);
+        const vote = await replyService.checkForVoteForReply(userData.userId, replyId);
         if (vote == null) {
             next(new ApplicationError(`Vote by {userId: ${userData.userId}} does not exist for {replyId: ${replyId}}`));
             return res.status(500).json({

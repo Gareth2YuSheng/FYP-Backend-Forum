@@ -116,7 +116,7 @@ exports.editForumReply = (content, userId, reply) => {
     });
 } //End of editReply
 
-exports.voteForumReply = (userId, parentId, type) => {
+exports.voteForumReply = (userId, replyId, type) => {
     logger.info("voteForumReply running");
     //update forum post reply voteCount, and create vote record in DB
     return new Promise(async (res, rej) => {
@@ -124,10 +124,10 @@ exports.voteForumReply = (userId, parentId, type) => {
             const result = await models.Vote.create({
                 type: type,
                 userId: userId,
-                parentId: parentId
+                replyId: replyId
             });
             const increment = (type) ? 1 : -1;
-            const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: parentId } });
+            const voteResult = await models.PostReply.increment({ voteCount: increment }, { where: { replyId: replyId } });
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
@@ -135,14 +135,14 @@ exports.voteForumReply = (userId, parentId, type) => {
     })
 } //End of voteForumReply
 
-exports.checkForVote = (userId, parentId) => {
-    logger.info("checkForVote running");
+exports.checkForVoteForReply = (userId, replyId) => {
+    logger.info("checkForVoteForReply running");
     //check if user has already voted for forum post reply  
     return new Promise(async (res, rej) => {
         try{
             const result = await models.Vote.findOne({
                 where: { 
-                    parentId: parentId,
+                    replyId: replyId,
                     userId: userId
                 }
             });
@@ -151,7 +151,7 @@ exports.checkForVote = (userId, parentId) => {
             rej(new DatabaseError(error.message));
         }
     })
-} //End of checkForVote
+} //End of checkForVoteForReply
 
 exports.changeVoteType = (vote, type) => { 
     logger.info("changeVoteType running");
@@ -164,7 +164,7 @@ exports.changeVoteType = (vote, type) => {
             });
             const result = await vote.save();
             const increment = (type) ? 2 : -2; //increment 2 as this is changing vote type not adding a vote
-            const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: vote.parentId } });
+            const voteResult = await models.PostReply.increment({ voteCount: increment }, { where: { replyId: vote.replyId } });
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
@@ -180,7 +180,7 @@ exports.unvoteForumReply = (vote, replyId) => {
             const increment = (vote.type) ? -1 : 1;
             const result = await vote.destroy();
             //minus vote value from reply vote count
-            const voteResult = await models.PostReply.increment({voteCount: increment}, { where: { replyId: replyId } });
+            const voteResult = await models.PostReply.increment({ voteCount: increment }, { where: { replyId: replyId } });
             res("Vote deleted successfully");
         } catch (error) {
             rej(new DatabaseError(error.message));
