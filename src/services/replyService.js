@@ -208,3 +208,19 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
         }
     });
 } //End of markForumReplyAsCorrectAnswer
+
+exports.deleteReply = (replyId) => {
+    logger.info("deleteReply running");
+    //delete forum post reply instance provided
+    return new Promise(async (res, rej) => {
+        try {
+            //delete reply
+            const result = await models.PostReply.destroy({
+                where: { replyId: replyId }
+            });     
+            res("Reply Deleted Successfully.");
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    });
+} //End of deleteReply

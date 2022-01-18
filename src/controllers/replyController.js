@@ -302,3 +302,50 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
         });
     }
 }; //End of markForumReplyAsCorrectAnswer
+
+exports.deleteForumPostReply = async (req, res, next) => {
+    logger.info("deleteForumPostReply running");
+    const replyId = req.params.r_id;
+    const userData = req.body.userData;
+    try {        
+        //Check if reply with replyId provided exists
+        const reply = await replyService.getReplyById(replyId);
+        //If reply does not exist return error
+        if (reply == null) {
+            next(new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`));
+            return res.status(500).json({ 
+                "success": false,
+                "data": null,
+                "message": "Reply does not exist." 
+            });
+        } 
+        //If reply userId and userData userId do not match
+        else if (reply.userId != userData.userId) {
+            next(new ApplicationError(`Unauthorized User trying to delete: {replyId: ${replyId}}`));
+            return res.status(500).json({
+                "success": false,
+                "data": null,
+                "message": "Unauthorized User." 
+            });
+        }
+        //delete reply with replyId
+        const results = await replyService.deleteReply(replyId);
+        if (results) {
+            logger.info(`Successfully deleted reply: {replyId: ${reply.replyId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": null,
+                "message": "Reply Deleted Successfully." 
+            });
+        }
+    } catch (error) {
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error);
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": "Server is unable to process the request." 
+        });
+    }
+}; //End of deleteForumPostReply

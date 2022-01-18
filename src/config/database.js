@@ -13,7 +13,7 @@ const Vote = require("../models/Vote");
 const Subject = require("../models/Subject");
 const Grade = require("../models/Grade");
 const File = require("../models/File");
-const Like = require("../models/Like");
+// const Like = require("../models/Like");
 const Request = require("../models/Request");
 const Comment = require("../models/Comment");
 const Conversation = require("../models/Conversation");
@@ -114,30 +114,30 @@ sequelize.models.Vote.belongsTo(sequelize.models.Post, {
 });
 
 //like Table
-sequelize.models.User.hasMany(sequelize.models.Like, {
-    foreignKey: {
-        name: "userId"
-    },
-    onDelete: "CASCADE"
-});
-sequelize.models.Like.belongsTo(sequelize.models.User, {
-    foreignKey: {
-        name: "userId"
-    },
-    onDelete: "CASCADE"
-});
-sequelize.models.Post.hasMany(sequelize.models.Like, {
-    foreignKey: {
-        name: "parentId"
-    },
-    onDelete: "CASCADE"
-});
-sequelize.models.Like.belongsTo(sequelize.models.Post, {
-    foreignKey: {
-        name: "parentId"
-    },
-    onDelete: "CASCADE"
-});
+// sequelize.models.User.hasMany(sequelize.models.Like, {
+//     foreignKey: {
+//         name: "userId"
+//     },
+//     onDelete: "CASCADE"
+// });
+// sequelize.models.Like.belongsTo(sequelize.models.User, {
+//     foreignKey: {
+//         name: "userId"
+//     },
+//     onDelete: "CASCADE"
+// });
+// sequelize.models.Post.hasMany(sequelize.models.Like, {
+//     foreignKey: {
+//         name: "parentId"
+//     },
+//     onDelete: "CASCADE"
+// });
+// sequelize.models.Like.belongsTo(sequelize.models.Post, {
+//     foreignKey: {
+//         name: "parentId"
+//     },
+//     onDelete: "CASCADE"
+// });
 
 //subject Table
 sequelize.models.Subject.hasMany(sequelize.models.Topic, {

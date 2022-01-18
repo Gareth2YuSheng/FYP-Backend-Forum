@@ -13,15 +13,11 @@ const sequelizeOptions = {
     logging: msg => logger.info(msg),
     maxConcurrentQueries: 100,
     dialect: 'postgres',
-    // dialectOptions: {
-    //     ssl:'Amazon RDS'
-    // },
     pool: { max: 100, idle: 300000 }, //5 mins
     language: 'en'
 }
 
 const sequelize = new Sequelize(sequelizeOptions);
-// const sequelize = new Sequelize("postgres://qpvhphyz:gQhkrMCspzamZ2ao7OSfLaJv38V2IpbZ@john.db.elephantsql.com/qpvhphyz");
 
 sequelize.testConnection = async () => {
     try {
