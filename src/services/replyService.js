@@ -1,5 +1,6 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
+const postService = require("./postService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
@@ -13,6 +14,8 @@ exports.createReply = (content, userId, parentId) => {
                 userId: userId,
                 parentId: parentId
             });
+            //Increase reply count for post
+            const countResult = await postService.incrementPostReplyCount(parentId, 1);
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
@@ -196,6 +199,9 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
             });
             //save the changes to the DB
             const result = await reply.save();
+            //Increment the answerCount in post
+            const increment = (isAnswer) ? 1 : -1;
+            const countResult = await postService.incrementPostAnswerCount(reply.parentId, increment);
             res(result);
         } catch (error) {
             rej(new DatabaseError(error.message));
