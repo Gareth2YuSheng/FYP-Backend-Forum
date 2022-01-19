@@ -141,7 +141,7 @@ exports.voteForumReply = async (req, res, next) => {
         let errMsg = "Server is unable to process the request.";
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else {
-            if (error.message === "insert or update on table \"vote\" violates foreign key constraint \"vote_parentId_fkey\"") {
+            if (error.message === "insert or update on table \"vote\" violates foreign key constraint \"vote_replyId_fkey\"") {
                 errMsg = "Reply does not exist.";
             }
             next(error);
