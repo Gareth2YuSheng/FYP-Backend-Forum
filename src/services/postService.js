@@ -93,7 +93,11 @@ exports.getPostDetailsById = (postId, userId) => {
                     }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
-                    },
+                    }, {
+                        model: models.Vote,
+                        where: { userId: userId },
+                        required: false
+                    }
                     // {
                     //     model: models.Like,
                     //     where: { userId: userId },
@@ -153,7 +157,11 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
                     }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
-                    }, 
+                    }, {
+                        model: models.Vote,
+                        where: { userId: userId },
+                        required: false
+                    }
                     // {
                     //     model: models.Like,
                     //     where: { userId: userId },
