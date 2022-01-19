@@ -264,6 +264,117 @@ exports.deleteForumQuestion = async (req, res, next) => {
     }
 }; //End of deleteForumQuestion
 
+exports.voteForumPost = async (req, res, next) => {
+    logger.info("voteForumPost running");
+    const postId = req.params.q_id;
+    const userData = req.body.userData;
+    const voteData = req.body.voteData;
+    voteData.type = voteData.type === "up";
+    try {        
+        //Make sure there is a user with the userId before upvoting post
+        const user = await userService.getIfNotCreateUser(userData);
+        //check if user has voted on this post before
+        const vote = await postService.checkForVoteForPost(userData.userId, postId);
+        //if vote exists and is the same type return
+        if (vote && vote.type == voteData.type) {
+            logger.info(`Vote: {voteId: ${vote.voteId}} for {postId: ${postId}} by {userId: ${userData.userId}} already exists`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    voteId: vote.voteId
+                },
+                "message": "User has already voted on this post."
+            });
+        } 
+        //else if vote exists but is a different type change it
+        else if (vote && vote.type != voteData.type) {
+            const results = await postService.changeVoteType(vote, voteData.type);
+            if (results) {
+                logger.info(`Vote: {voteId: ${vote.voteId}} for {postId: ${postId}} by {userId: ${userData.userId}} has been changed to {type: ${voteData.type}}`);
+                return res.status(200).json({  
+                    "success": true,
+                    "data": {
+                        voteId: vote.voteId
+                    },
+                    "message": "User vote has been updated."
+                });
+            }            
+        } 
+        //else if vote doesnt exist create it
+        else {
+            //Create vote record and update post voteCount
+            const results = await postService.voteForumPost(
+                user.userId,
+                postId,
+                voteData.type);
+            if (results) {
+                logger.info(`Successfully created vote: {voteId: ${results.voteId}} for {postId: ${postId}}`);
+                return res.status(200).json({  
+                    "success": true,
+                    "data": {
+                        voteId: results.voteId
+                    },
+                    "message": "Vote Created Successfully."
+                });
+            }
+        }
+    } catch (error) {
+        let errMsg = "Server is unable to process the request.";
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else {
+            //Update this
+            if (error.message === "insert or update on table \"vote\" violates foreign key constraint \"vote_postId_fkey\"") {
+                errMsg = "Post does not exist.";
+            }
+            next(error);
+        } 
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": errMsg
+        });
+    }
+}; //End of voteForumPost
+
+exports.deleteForumPostVote = async (req, res, next) => {
+    logger.info("deleteForumPostVote running");
+    const postId = req.params.q_id;
+    const userData = req.body.userData;
+    try {        
+        //Make sure there is a user with the userId before unvoting reply
+        // const user = await userService.getIfNotCreateUser(userData);
+        //check if user has voted on this reply before
+        const vote = await postService.checkForVoteForPost(userData.userId, postId);
+        if (vote == null) {
+            next(new ApplicationError(`Vote by {userId: ${userData.userId}} does not exist for {postId: ${postId}}`));
+            return res.status(500).json({
+                "success": false,
+                "data": null,
+                "message": "Vote does not exist."
+            });
+        }
+        const results = await postService.unvoteForumPost(vote, postId);
+        if (results) {
+            logger.info(`Successfully deleted vote: {voteId: ${vote.voteId}} for {postId: ${postId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": null,
+                "message": "Vote Deleted Successfully."
+            });
+        }        
+    } catch (error) {
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error);
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": "Server is unable to process the request." 
+        });
+    }
+}; //End of deleteForumPostVote
+
 // exports.likeForumQuestion = async (req, res, next) => {
 //     logger.info("likeForumQuestion running");
 //     const postId = req.params.p_id;

@@ -93,7 +93,11 @@ exports.getPostDetailsById = (postId, userId) => {
                     }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
-                    },
+                    }, {
+                        model: models.Vote,
+                        where: { userId: userId },
+                        required: false
+                    }
                     // {
                     //     model: models.Like,
                     //     where: { userId: userId },
@@ -153,7 +157,11 @@ exports.getPosts = (count, page, subject, topic, grade, search, userId) => { //s
                     }, {
                         attributes: ["firstName", "lastName", "profileImage"],
                         model: models.User
-                    }, 
+                    }, {
+                        model: models.Vote,
+                        where: { userId: userId },
+                        required: false
+                    }
                     // {
                     //     model: models.Like,
                     //     where: { userId: userId },
@@ -238,6 +246,78 @@ exports.incrementPostReplyCount = (postId, increment) => {
         }
     });
 } //End of incrementPostReplyCount
+
+exports.voteForumPost = (userId, postId, type) => {
+    logger.info("voteForumPost running");
+    //update forum post voteCount, and create vote record in DB
+    return new Promise(async (res, rej) => {
+        try{
+            const result = await models.Vote.create({
+                type: type,
+                userId: userId,
+                postId: postId
+            });
+            const increment = (type) ? 1 : -1;
+            const voteResult = await models.Post.increment({ voteCount: increment }, { where: { postId: postId } });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of voteForumPost
+
+exports.checkForVoteForPost = (userId, postId) => {
+    logger.info("checkForVoteForPost running");
+    //check if user has already voted for forum post  
+    return new Promise(async (res, rej) => {
+        try{
+            const result = await models.Vote.findOne({
+                where: { 
+                    postId: postId,
+                    userId: userId
+                }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of checkForVoteForPost
+
+exports.changeVoteType = (vote, type) => { 
+    logger.info("changeVoteType running");
+    //update vote type given by user
+    return new Promise(async (res, rej) => {
+        try{
+            //update the fields in the vote instance
+            vote.set({
+                type: type
+            });
+            const result = await vote.save();
+            const increment = (type) ? 2 : -2; //increment 2 as this is changing vote type not adding a vote
+            const voteResult = await models.Post.increment({ voteCount: increment }, { where: { postId: vote.postId } });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of changeVoteType
+
+exports.unvoteForumPost = (vote, postId) => {
+    logger.info("unvoteForumPost running");
+    //delete user's vote for a forum post 
+    return new Promise(async (res, rej) => {
+        try{
+            const increment = (vote.type) ? -1 : 1;
+            const result = await vote.destroy();
+            //minus vote value from reply vote count
+            const voteResult = await models.Post.increment({ voteCount: increment }, { where: { postId: postId } });
+            res("Vote deleted successfully");
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of unvoteForumPost
 
 // exports.likeForumQuestion = (userId, parentId, type) => {
 //     logger.info("likeForumQuestion running");
