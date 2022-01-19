@@ -352,46 +352,46 @@ const validationFn = {
         }
     }, //End of validateGetForumQuestionReplies
 
-    validateLikeForumQuestion: function(req, res, next) {
-        logger.info("validateLikeForumQuestion middleware called");
-        let errorMsg = "";
-        const postId = req.params.p_id;
-        const userData = req.body.userData;
-        const likeData = req.body.likeData;
+    // validateLikeForumQuestion: function(req, res, next) {
+    //     logger.info("validateLikeForumQuestion middleware called");
+    //     let errorMsg = "";
+    //     const postId = req.params.p_id;
+    //     const userData = req.body.userData;
+    //     const likeData = req.body.likeData;
         
-        //Null or empty check
-        if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(likeData)) {
-            errorMsg = "Missing userData or likeData";
-        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
-            errorMsg = "Missing data in userData";
-        } 
-        //Check for valid replyId
-        else if (!validateUUID(postId)) {
-            errorMsg = "Invalid postId";
-        }
-        //check if vote type is missing
-        if (!likeData.type) {
-            errorMsg = "Missing data in likeData";
-        } else {
-            //convert vote type to lowercase
-            likeData.type = likeData.type.toLowerCase();
-        }
-        //check for valid vote type up ONLY
-        if (likeData.type !== "up") {
-            errorMsg = "Invalid like type";
-        }
+    //     //Null or empty check
+    //     if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(likeData)) {
+    //         errorMsg = "Missing userData or likeData";
+    //     } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
+    //         errorMsg = "Missing data in userData";
+    //     } 
+    //     //Check for valid replyId
+    //     else if (!validateUUID(postId)) {
+    //         errorMsg = "Invalid postId";
+    //     }
+    //     //check if vote type is missing
+    //     if (!likeData.type) {
+    //         errorMsg = "Missing data in likeData";
+    //     } else {
+    //         //convert vote type to lowercase
+    //         likeData.type = likeData.type.toLowerCase();
+    //     }
+    //     //check for valid vote type up ONLY
+    //     if (likeData.type !== "up") {
+    //         errorMsg = "Invalid like type";
+    //     }
 
-        if (errorMsg === "") { //if no error message move on
-            next();
-        } else {
-            logger.error("", new ValidationError("validateLikeForumQuestion Failed: " + errorMsg));
-            res.status(500).json({  
-                "success": false,
-                "data": null,
-                "message": errorMsg 
-            });
-        }
-    }, //End of validateLikeForumQuestion
+    //     if (errorMsg === "") { //if no error message move on
+    //         next();
+    //     } else {
+    //         logger.error("", new ValidationError("validateLikeForumQuestion Failed: " + errorMsg));
+    //         res.status(500).json({  
+    //             "success": false,
+    //             "data": null,
+    //             "message": errorMsg 
+    //         });
+    //     }
+    // }, //End of validateLikeForumQuestion
 
     validateVoteForumReply: function(req, res, next) {
         logger.info("validateVoteForumReply middleware called");
@@ -521,6 +521,76 @@ const validationFn = {
             });
         }
     }, //End of validateDeleteForumReply
+
+    validateVoteForumPost: function(req, res, next) {
+        logger.info("validateVoteForumPost middleware called");
+        let errorMsg = "";
+        const postId = req.params.q_id;
+        const userData = req.body.userData;
+        const voteData = req.body.voteData;
+        
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData) || !objValidateEmptyOrNull(voteData)) {
+            errorMsg = "Missing userData or voteData";
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
+            errorMsg = "Missing data in userData";
+        } 
+        //Check for valid replyId
+        else if (!validateUUID(postId)) {
+            errorMsg = "Invalid postId";
+        }
+        //check if vote type is missing
+        if (!voteData.type) {
+            errorMsg = "Missing data in voteData";
+        } else {
+            //convert vote type to lowercase
+            voteData.type = voteData.type.toLowerCase();
+        }
+        //check for valid vote type
+        if (voteData.type !== "up" && voteData.type !== "down") {
+            errorMsg = "Invalid vote type";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateVoteForumPost Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateVoteForumPost
+
+    validateDeleteVoteForumPost: function(req, res, next) {
+        logger.info("validateDeleteVoteForumPost middleware called");
+        let errorMsg = "";
+        const postId = req.params.q_id;
+        const userData = req.body.userData;
+        
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing userData";
+        } else if (!userData.userId) {
+            errorMsg = "Missing data in userData";
+        } 
+        //Check for valid replyId
+        else if (!validateUUID(postId)) {
+            errorMsg = "Invalid postId";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateDeleteVoteForumPost Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateDeleteVoteForumPost
 
     //sanitization function
     sanitizeResult: function(req, res, next){
