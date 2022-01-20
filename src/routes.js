@@ -44,6 +44,7 @@ exports.appRoute = router => {
     //POST
     router.post(urlPrefix + "/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post(urlPrefix + "/reply/:q_id/create", verifyFn.verifyToken, validationFn.validateCreateForumReply, replyController.createForumReply);
+    router.post(urlPrefix + "/reply/:r_id/rate", verifyFn.verifyToken, validationFn.validateRateCorrectForumReply, replyController.rateCorrectForumReply);
     
     //PUT
     router.put(urlPrefix + "/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);

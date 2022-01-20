@@ -271,7 +271,7 @@ exports.markForumReplyAsCorrectAnswer = async (req, res, next) => {
         }
         // Check if user is author of the post
         if (userData.userId != post.userId) {
-            next(new ApplicationError(`Unauthorized Edit Attempt: Unauthorized Mark Answer Reply Edit by {userId: ${userData.userId}} on {postId: ${questionId.questionId}}`));
+            next(new ApplicationError(`Unauthorized Edit Attempt: Unauthorized Mark Answer Reply Edit by {userId: ${userData.userId}} on {postId: ${post.postId}}`));
             return res.status(500).json({ 
                 "success": false,
                 "data": null,
@@ -349,3 +349,53 @@ exports.deleteForumPostReply = async (req, res, next) => {
         });
     }
 }; //End of deleteForumPostReply
+
+exports.rateCorrectForumReply = async (req, res, next) => {
+    logger.info("rateCorrectForumReply running");
+    const replyId = req.params.r_id;
+    const ratingData = req.body.ratingData;
+    const userData = req.body.userData;
+    let errorMsg = "";
+    try {        
+        //Make sure there is a user with the userId before making answer as correct
+        const user = await userService.getIfNotCreateUser(userData);
+        // Check if reply with replyId provided exists
+        const reply = await replyService.getReplyById(replyId);
+        //If reply does not exist return error
+        if (reply == null) {
+            errorMsg = "Reply does not exist.";
+            throw new ApplicationError(`Reply does not exist: {replyId: ${replyId}}`);
+        } else if (!reply.isAnswer) {
+            errorMsg = "Reply is not a correct answer.";
+            throw new ApplicationError(`Reply is not a correct answer: {replyId: ${replyId}}`);
+        }
+        const rating = await replyService.checkForCorrectReplyRating(reply.replyId, user.userId);
+        let results;
+        //if rating exists update it else create it
+        if (rating) {
+            results = await replyService.updateCorrectReplyRating(ratingData.rating, reply.replyId, user.userId);
+        } else {
+            results = await replyService.rateCorrectReply(ratingData.rating, reply.replyId, user.userId);
+        }        
+        if (results) {
+            logger.info(`Successfully rated correct reply: ${results.replyId}`);
+            return res.status(200).json({
+                "success": true,
+                "data": {
+                    replyId: replyId
+                },
+                "message": "Correct Reply Rated Successfully"
+            });
+        }
+    } catch (error) {
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error);
+        if (errorMsg === "") errorMsg = "Server is unable to process the request.";
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": errorMsg 
+        });
+    }
+}; //End of rateCorrectForumReply
