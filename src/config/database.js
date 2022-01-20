@@ -20,6 +20,7 @@ const Conversation = require("../models/Conversation");
 const ChatMessage = require("../models/ChatMessage");
 const ConversationMember = require("../models/ConversationMember");
 const Review = require("../models/Review");
+const ReplyRating = require("../models/ReplyRating");
 
 
 //Define Associations
@@ -342,6 +343,28 @@ sequelize.models.User.hasMany(sequelize.models.Review, {
 sequelize.models.Review.belongsTo(sequelize.models.User, {
     foreignKey: {
         name: "tutorId"
+    }
+});
+
+//replyRating Table
+sequelize.models.User.hasMany(sequelize.models.ReplyRating, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.ReplyRating.belongsTo(sequelize.models.User, {
+    foreignKey: {
+        name: "userId"
+    }
+});
+sequelize.models.PostReply.hasMany(sequelize.models.ReplyRating, {
+    foreignKey: {
+        name: "replyId"
+    }
+});
+sequelize.models.ReplyRating.belongsTo(sequelize.models.PostReply, {
+    foreignKey: {
+        name: "replyId"
     }
 });
 
