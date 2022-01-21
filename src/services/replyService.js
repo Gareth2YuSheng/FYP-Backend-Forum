@@ -193,10 +193,17 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
     //update forum post reply instance with the details provided
     return new Promise(async (res, rej) => {
         try {
-            //update the fields in the post instance
-            reply.set({
+            const newReplyData = {
                 isAnswer: isAnswer
-            });
+            };
+            if (!isAnswer) {
+                newReplyData.rating = null;
+                const deleteResult = await models.ReplyRating.destroy({
+                    where: { replyId: reply.replyId }
+                });
+            }
+            //update the fields in the post instance
+            reply.set(newReplyData);
             //save the changes to the DB
             const result = await reply.save();
             //Increment the answerCount in post
@@ -224,3 +231,87 @@ exports.deleteReply = (replyId) => {
         }
     });
 } //End of deleteReply
+
+exports.rateCorrectReply = (rating, replyId, userId) => {
+    //update rating, reset to 0 of reply was unmarked
+    logger.info("rateCorrectReply running");
+    //create a record in the review table for the rating and review
+    return new Promise(async (res, rej) => {
+        try {
+            rating = Math.round(rating * 100) / 100;
+            const newRatingData = {
+                rating: rating,
+                userId: userId,
+                replyId: replyId
+            };
+            const result = await models.ReplyRating.create(newRatingData);
+            //Get the new average rating of the tutor
+            const newAverageRating = await models.ReplyRating.findAll({
+                attributes: [
+                    [sequelize.fn("AVG", sequelize.col("rating")), "rating"]
+                ],
+                where: { replyId: replyId }
+            });
+            const newRating = Math.round((newAverageRating[0].dataValues.rating) * 100) / 100;
+            //Update the average rating of the tutor
+            const updateResult = await models.PostReply.update({ rating: newRating }, {
+                where: { replyId: replyId }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of rateCorrectReply
+
+exports.checkForCorrectReplyRating = (replyId, userId) => {
+    //update rating, reset to 0 of reply was unmarked
+    logger.info("checkForCorrectReplyRating running");
+    //create a record in the review table for the rating and review
+    return new Promise(async (res, rej) => {
+        try {
+            const result = await models.ReplyRating.findOne({
+                where: {
+                    replyId: replyId,
+                    userId: userId
+                }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of checkForCorrectReplyRating
+
+exports.updateCorrectReplyRating = (rating, replyId, userId) => {
+    //update rating, reset to 0 of reply was unmarked
+    logger.info("updateCorrectReplyRating running");
+    //create a record in the review table for the rating and review
+    return new Promise(async (res, rej) => {
+        try {
+            const result = await models.ReplyRating.update({ rating: rating }, {
+                where: {
+                    replyId: replyId,
+                    userId: userId
+                }
+            });
+            //Get the new average rating of the tutor
+            const newAverageRating = await models.ReplyRating.findAll({
+                attributes: [
+                    [sequelize.fn("AVG", sequelize.col("rating")), "rating"]
+                ],
+                where: { replyId: replyId }
+            });
+            const newRating = Math.round((newAverageRating[0].dataValues.rating) * 100) / 100;
+            //Update the average rating of the tutor
+            const updateResult = await models.PostReply.update({ rating: newRating }, {
+                where: { replyId: replyId }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of updateCorrectReplyRating
+
+//delete correct reply ratings

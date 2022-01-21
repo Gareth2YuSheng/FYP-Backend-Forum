@@ -592,6 +592,44 @@ const validationFn = {
         }
     }, //End of validateDeleteVoteForumPost
 
+    validateRateCorrectForumReply: function(req, res, next) {
+        logger.info("validateRateCorrectForumReply middleware called");
+        let errorMsg = "";
+        const replyId = req.params.r_id;
+        const ratingData = req.body.ratingData;
+        const userData = req.body.userData;
+        
+        //Null or empty check
+        if (!objValidateEmptyOrNull(ratingData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing ratingData or missing userData or missing userData";
+        } else if (!ratingData.rating) {
+            errorMsg = "Missing rating in ratingData";
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
+            errorMsg = "Missing data in userData";
+        }
+        //Validate Ids
+        else if (!validateUUID(replyId)) {
+            errorMsg = "Invalid replyId";
+        } else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userId for userData";
+        } 
+        //Validate rating
+        else if (ratingData.rating <= 0 || ratingData.rating > 5) {
+            errorMsg = "Invalid rating for ratingData";
+        }    
+        
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateRateCorrectForumReply Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateRateCorrectForumReply
+
     //sanitization function
     sanitizeResult: function(req, res, next){
         logger.info("sanitizeResult middleware called");
