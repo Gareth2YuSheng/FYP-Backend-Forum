@@ -52,7 +52,7 @@ exports.getReplies = (questionId, count, page, userId) => { //send user data as 
                 ],
                 where: { parentId: questionId },
                 include: [{
-                    attributes: ["firstName", "lastName", "profileImage"],
+                    attributes: ["firstName", "lastName", "profileImage", "roleId"],
                     model: models.User
                 }, {
                     model: models.Vote,
