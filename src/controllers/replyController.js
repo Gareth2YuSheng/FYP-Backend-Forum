@@ -3,7 +3,6 @@ const { logger } = require("../logger/logger");
 const userService = require("../services/userService");
 const postService = require("../services/postService");
 const replyService = require("../services/replyService");
-const PostReply = require("../models/PostReply");
 
 exports.getForumQuestionReplies = async (req, res, next) => {
     logger.info("getForumQuestionReply running");
@@ -24,8 +23,7 @@ exports.getForumQuestionReplies = async (req, res, next) => {
                 replies
             },
             "message": null 
-        });
-        
+        });        
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);

@@ -36,3 +36,17 @@ exports.getIfNotCreateUser = (userData) => {
     });
 } //End of getIfNotCreateUser
 
+exports.updateUserById = (userId, userData) => {
+    logger.info("updateUserById running");
+    return new Promise(async (res, rej) => {
+        try {
+            const user = await models.User.update(userData, {
+                where: { userId: userId }
+            });
+            res(user);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of updateUserById
+
