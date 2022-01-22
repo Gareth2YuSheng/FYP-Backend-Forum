@@ -33,6 +33,9 @@ const User = sequelize.define("User", {
                 isDecimal:true
             }
         },
+        preferredSubject: {
+            type: DataTypes.STRING
+        },
         //Foreign Keys
         roleId: {
             type: DataTypes.INTEGER,
