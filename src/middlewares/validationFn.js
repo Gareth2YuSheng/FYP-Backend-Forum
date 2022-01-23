@@ -630,6 +630,36 @@ const validationFn = {
         }
     }, //End of validateRateCorrectForumReply
 
+    validateUpdateUser: function(req, res, next) {
+        logger.info("validateUpdateUser middleware called");
+        let errorMsg = "";
+        const userData = req.body.userData;
+        const userId = req.params.u_id;
+
+        console.log(userData)
+        //Null or empty check
+        if (!objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing userData";
+        }  else if (!userData.firstName || !userData.email) {
+            errorMsg = "Missing data in userData";
+        }
+        //Validate UserId
+        else if (!validateUUID(userId)) {
+            errorMsg = "Invalid userId";
+        } 
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateUpdateUser Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateUpdateUser
+
     //sanitization function
     sanitizeResult: function(req, res, next){
         logger.info("sanitizeResult middleware called");

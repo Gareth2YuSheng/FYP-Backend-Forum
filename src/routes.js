@@ -53,6 +53,7 @@ exports.appRoute = router => {
     router.put(urlPrefix + "/reply/:r_id/correct", verifyFn.verifyToken, validationFn.validateMarkReplyAsAnswer, replyController.markForumReplyAsCorrectAnswer);
     router.put(urlPrefix + "/reply/:r_id/vote", verifyFn.verifyToken, validationFn.validateVoteForumReply, replyController.voteForumReply);
     router.put(urlPrefix + "/question/:q_id/vote", verifyFn.verifyToken, validationFn.validateVoteForumPost, questionController.voteForumPost);
+    router.put(urlPrefix + "/user/:u_id/update", verifyFn.verifyToken, validationFn.validateUpdateUser, authController.updateUserProfile);
 
     //DELETE
     router.delete(urlPrefix + "/question/:q_id/delete", verifyFn.verifyToken, validationFn.validateDeleteForumQuestion, questionController.deleteForumQuestion);

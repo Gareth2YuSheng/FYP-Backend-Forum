@@ -324,6 +324,18 @@ sequelize.models.ConversationMember.belongsTo(sequelize.models.Conversation, {
     }
 });
 
+//conversation Table
+sequelize.models.Request.hasOne(sequelize.models.Conversation, {
+    foreignKey: {
+        name: "requestId"
+    }
+});
+sequelize.models.Conversation.belongsTo(sequelize.models.Request, {
+    foreignKey: {
+        name: "requestId"
+    }
+});
+
 //review Table
 sequelize.models.User.hasMany(sequelize.models.Review, {
     foreignKey: {

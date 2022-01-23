@@ -1,44 +1,37 @@
 const { ApplicationError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
+const userService = require("../services/userService");
 
-exports.register = async (req, res, next) => {
-    logger.info("register running");
+exports.updateUserProfile = async (req, res, next) => {
+    logger.info("updateUserProfile running");
+    const userData = req.body.userData;
+    const userId = req.params.u_id;
+    let errorMsg = "";
     try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
+        const user = await userService.getUserByUserId(userId);
+        if (user == null) {
+            errorMsg = "User does not exist.";
+            throw new ApplicationError(`User does not exist: {userId: ${userId}}`);
+        }
+        const results = await userService.updateUserById(userId, userData);
+        if (results) {
+            logger.info(`Successfully updated user: {userId: ${userId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": {
+                    userId: userId
+                },
+                "message": null 
+            }); 
+        }
     } catch (error) { //change error handling to add database error check later
         next(new ApplicationError(error.message));
+        if (errorMsg === "") errorMsg = "Server is unable to process the request.";
         //response to be standardised for each request
         return res.status(500).json({  
             "success": false,
             "data": null,
-            "message": "Server is unable to process the request." 
+            "message": errorMsg
         });
     }
-}; //End of register
-
-exports.login = async (req, res, next) => {
-    logger.info("login running");
-    try {        
-        
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
-        return res.status(200).json({  
-            "success": true,
-            "data": null,
-            "message": null 
-        });
-    } catch (error) {
-        next(new ApplicationError(error.message));
-        //response to be standardised for each request
-        return res.status(500).json({  
-            "success": false,
-            "data": null,
-            "message": "Server is unable to process the request." 
-        });
-    }
-}; //End of login
+}; //End of updateUserProfile
