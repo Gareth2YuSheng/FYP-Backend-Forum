@@ -319,6 +319,27 @@ exports.unvoteForumPost = (vote, postId) => {
     })
 } //End of unvoteForumPost
 
+exports.createCommentForPost = (content, postId, userId) => {
+    logger.info("createCommentForPost running");
+    //create comment for forum post with the content provided
+    return new Promise(async (res, rej) => {
+        try {
+            const result = await models.Comment.create({
+                content: content,
+                userId: userId,
+                postId: postId
+            });
+            //Increase comment count for post
+            const countResult = await models.Post.increment({ commentCount: 1 }, {
+                where: { postId: postId }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of createCommentForPost
+
 // exports.likeForumQuestion = (userId, parentId, type) => {
 //     logger.info("likeForumQuestion running");
 //     //update forum post likeCount, and create like record in DB

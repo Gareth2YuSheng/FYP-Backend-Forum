@@ -50,6 +50,15 @@ const Post = sequelize.define("Post", {
                 isInt: true
             }
         },
+        commentCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                isInt: true
+            }
+        },
         replyCount: {
             type: DataTypes.INTEGER,
             defaultValue: 0,

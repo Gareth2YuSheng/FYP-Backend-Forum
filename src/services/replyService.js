@@ -314,4 +314,23 @@ exports.updateCorrectReplyRating = (rating, replyId, userId) => {
     })
 } //End of updateCorrectReplyRating
 
-//delete correct reply ratings
+exports.createCommentForReply = (content, replyId, userId) => {
+    logger.info("createCommentForReply running");
+    //create comment for forum reply with the content provided
+    return new Promise(async (res, rej) => {
+        try {
+            const result = await models.Comment.create({
+                content: content,
+                userId: userId,
+                replyId: replyId
+            });
+            //Increase comment count for reply
+            const countResult = await models.PostReply.increment({ commentCount: 1 }, {
+                where: { replyId: replyId }
+            });
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of createCommentForReply

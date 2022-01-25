@@ -26,7 +26,8 @@ exports.getIfNotCreateUser = (userData) => {
                 defaults: {
                     firstName: userData.firstName,
                     lastName: userData.lastName,
-                    roleId: userData.roleId
+                    roleId: userData.roleId,
+                    profileImage: userData.profileImage
                 }
             });
             res(user);

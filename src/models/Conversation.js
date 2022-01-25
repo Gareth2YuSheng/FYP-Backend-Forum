@@ -21,7 +21,12 @@ const Conversation = sequelize.define("Conversation", {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: true
-        }
+        },
+        //Foreign Keys
+        requestId: {
+            type: DataTypes.UUID,
+            allowNull: true
+        },
     }, {
         tableName: "conversation"
     }
