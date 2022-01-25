@@ -40,6 +40,7 @@ exports.appRoute = router => {
     router.get(urlPrefix + "/reply/:q_id?", verifyFn.verifyToken, validationFn.validateGetForumQuestionReplies, replyController.getForumQuestionReplies);
     router.get(urlPrefix + "/question/all?", verifyFn.verifyToken, validationFn.validateGetForumQuestions, questionController.getForumQuestions);
     router.get(urlPrefix + "/question/subject/count", verifyFn.verifyToken, questionController.getForumQuestionCountBySubject);
+    router.get(urlPrefix + "/user/:u_id/counts", verifyFn.verifyToken, validationFn.validateGetUserCounts, authController.getUserQuestionAndReplyCounts);
 
     //POST
     router.post(urlPrefix + "/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);

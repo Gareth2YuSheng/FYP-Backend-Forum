@@ -51,3 +51,24 @@ exports.updateUserById = (userId, userData) => {
     });
 } //End of updateUserById
 
+exports.getUserQuestionAndReplyCounts = (userId, question=false, reply=false) => {
+    logger.info("getUserQuestionAndReplyCounts running");
+    return new Promise(async (res, rej) => {
+        try {
+            const result = { questionCount: 0, replyCount: 0 };
+            if (question) {
+                result.questionCount += await models.Post.count({
+                    where: { userId: userId }
+                });
+            }
+            if (reply) {
+                result.replyCount += await models.PostReply.count({
+                    where: { userId: userId }
+                });
+            }
+            res(result);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }        
+    });
+} //End of getUserQuestionAndReplyCounts
