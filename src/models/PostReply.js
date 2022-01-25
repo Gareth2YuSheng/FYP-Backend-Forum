@@ -39,6 +39,15 @@ const PostReply = sequelize.define("PostReply", {
                 isDecimal:true
             }
         },
+        commentCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+            validate: {
+                notNull: true,
+                isInt: true
+            }
+        },
         //Foreign Keys
         userId: {
             type: DataTypes.UUID,
