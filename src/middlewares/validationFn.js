@@ -660,6 +660,27 @@ const validationFn = {
         }
     }, //End of validateUpdateUser
 
+    validateGetUserCounts: function(req, res, next) {
+        logger.info("validateGetUserCounts middleware called");
+        let errorMsg = "";
+        const userId = req.params.u_id;
+        //Validate UserId
+        if (!validateUUID(userId)) {
+            errorMsg = "Invalid userId";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateGetUserCounts Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateGetUserCounts
+
     //sanitization function
     sanitizeResult: function(req, res, next){
         logger.info("sanitizeResult middleware called");
