@@ -340,6 +340,33 @@ exports.createCommentForPost = (content, postId, userId) => {
     })
 } //End of createCommentForPost
 
+exports.getCommentsForPost = (postId, count, page) => {
+    logger.info("getCommentsForPost running");
+    const offset = (count*(page-1));
+    //get comments for forum post with the postId provided
+    return new Promise(async (res, rej) => {
+        try {
+            const results = await models.Comment.findAll({
+                limit: count,
+                offset: offset,
+                order: [
+                    ["createdAt", "DESC"]
+                ],
+                where: {
+                    postId: postId
+                },
+                include: [{
+                    attributes: ["firstName", "lastName", "profileImage"],
+                    model: models.User
+                }]
+            });
+            res(results);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of getCommentsForPost
+
 // exports.likeForumQuestion = (userId, parentId, type) => {
 //     logger.info("likeForumQuestion running");
 //     //update forum post likeCount, and create like record in DB

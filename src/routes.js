@@ -41,12 +41,14 @@ exports.appRoute = router => {
     router.get(urlPrefix + "/question/all?", verifyFn.verifyToken, validationFn.validateGetForumQuestions, questionController.getForumQuestions);
     router.get(urlPrefix + "/question/subject/count", verifyFn.verifyToken, questionController.getForumQuestionCountBySubject);
     router.get(urlPrefix + "/user/:u_id/counts", verifyFn.verifyToken, validationFn.validateGetUserCounts, authController.getUserQuestionAndReplyCounts);
+    router.get(urlPrefix + "/comment/:type/:id", verifyFn.verifyToken, validationFn.validateGetComments, questionController.getCommentsForPostOrReply);
 
     //POST
     router.post(urlPrefix + "/question/create", verifyFn.verifyToken, upload.array("file", 6), validationFn.validateCreateForumQuestion, questionController.createForumQuestion);
     router.post(urlPrefix + "/reply/:q_id/create", verifyFn.verifyToken, validationFn.validateCreateForumReply, replyController.createForumReply);
     router.post(urlPrefix + "/reply/:r_id/rate", verifyFn.verifyToken, validationFn.validateRateCorrectForumReply, replyController.rateCorrectForumReply);
-    
+    router.post(urlPrefix + "/comment/:type/:id", verifyFn.verifyToken, validationFn.validateCreateComment, questionController.commentOnForumPostOrReply);
+
     //PUT
     router.put(urlPrefix + "/question/:q_id/edit", verifyFn.verifyToken, validationFn.validateEditForumQuestion, questionController.editForumQuestionDetails);
     // router.put(urlPrefix + "/question/:p_id/like", verifyFn.verifyToken, validationFn.validateLikeForumQuestion, questionController.likeForumQuestion);
