@@ -1,6 +1,7 @@
 const { ApplicationError, DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
 const postService = require("../services/postService");
+const replyService = require("../services/replyService");
 const userService = require("../services/userService");
 const topicService = require("../services/topicService");
 
@@ -374,6 +375,101 @@ exports.deleteForumPostVote = async (req, res, next) => {
         });
     }
 }; //End of deleteForumPostVote
+
+exports.commentOnForumPostOrReply = async (req, res, next) => {
+    logger.info("commentOnForumPostOrReply running");
+    const userData = req.body.userData;
+    const commentData = req.body.commentData;
+    const type = req.params.type.toLowerCase();
+    const objectId = req.params.id;
+    let errorMsg = "";
+    try {
+        //get object
+        let object = null;
+        if (type === "question") {
+            object = await postService.getPostById(objectId);
+        } else if (type === "reply") {
+            object = await replyService.getReplyById(objectId);
+        }
+        //if object does not exist
+        if (object == null) {
+            errorMsg = type+" does not exist.";
+            throw new ApplicationError(`Object of type: ${type} does not exist: {Id: ${objectId}}`);
+        }
+        //Create comment
+        let results = null;
+        if (type === "question") {
+            results = await postService.createCommentForPost(commentData.commentContent, objectId, userData.userId);
+        } else if (type === "reply") {
+            results = await replyService.createCommentForReply(commentData.commentContent, objectId, userData.userId);
+        }
+        if (results) {
+            logger.info(`Successfully created comment: {commentId: ${results.commentId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": { commentId: results.commentId },
+                "message": "Comment Created Successfully." 
+            });
+        }        
+    } catch (error) {
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error);
+        if (errorMsg === "") errorMsg = "Server is unable to process the request.";
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": errorMsg 
+        });
+    }
+}; //End of commentOnForumPostOrReply
+
+exports.getCommentsForPostOrReply = async (req, res, next) => {
+    logger.info("getCommentsForPostOrReply running");
+    const { count, page } = req.query; 
+    const type = req.params.type.toLowerCase();
+    const objectId = req.params.id;
+    let errorMsg = "";
+    try {
+        //get object
+        let object = null;
+        if (type === "question") {
+            object = await postService.getPostById(objectId);
+        } else if (type === "reply") {
+            object = await replyService.getReplyById(objectId);
+        }
+        //if object does not exist
+        if (object == null) {
+            errorMsg = type+" does not exist.";
+            throw new ApplicationError(`Object of type: ${type} does not exist: {Id: ${objectId}}`);
+        }
+        //Create comment
+        let results = null;
+        if (type === "question") {
+            results = await postService.getCommentsForPost(objectId, count, page);
+        } else if (type === "reply") {
+            results = await replyService.getCommentsForReply(objectId, count, page);
+        }
+        if (results) {
+            logger.info(`Successfully retrieved comments {count:${count}, page:${page}} for object {type: ${type}, id: ${objectId}}`);
+            return res.status(200).json({  
+                "success": true,
+                "data": { comments: results },
+                "message": null 
+            });
+        }        
+    } catch (error) {
+        if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
+        else next(error);
+        if (errorMsg === "") errorMsg = "Server is unable to process the request.";
+        //response to be standardised for each request
+        return res.status(500).json({  
+            "success": false,
+            "data": null,
+            "message": errorMsg 
+        });
+    }
+}; //End of getCommentsForPostOrReply
 
 // exports.likeForumQuestion = async (req, res, next) => {
 //     logger.info("likeForumQuestion running");

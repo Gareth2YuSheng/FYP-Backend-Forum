@@ -334,3 +334,30 @@ exports.createCommentForReply = (content, replyId, userId) => {
         }
     })
 } //End of createCommentForReply
+
+exports.getCommentsForReply = (replyId, count, page) => {
+    logger.info("getCommentsForReply running");
+    const offset = (count*(page-1));
+    //get comments for forum reply with the replyId provided
+    return new Promise(async (res, rej) => {
+        try {
+            const results = await models.Comment.findAll({
+                limit: count,
+                offset: offset,
+                order: [
+                    ["createdAt", "DESC"]
+                ],
+                where: {
+                    replyId: replyId
+                },
+                include: [{
+                    attributes: ["firstName", "lastName", "profileImage"],
+                    model: models.User
+                }]
+            });
+            res(results);
+        } catch (error) {
+            rej(new DatabaseError(error.message));
+        }
+    })
+} //End of getCommentsForReply
