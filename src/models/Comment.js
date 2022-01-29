@@ -26,17 +26,11 @@ const Comment = sequelize.define("Comment", {
         },
         postId: {
             type: DataTypes.UUID,
-            allowNull: false,
-            validate: {
-                notNull: true
-            }
+            allowNull: true
         },
         replyId: {
             type: DataTypes.UUID,
-            allowNull: false,
-            validate: {
-                notNull: true
-            }
+            allowNull: true
         }
     }, {
         tableName: "comment"

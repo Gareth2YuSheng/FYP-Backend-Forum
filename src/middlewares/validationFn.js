@@ -681,6 +681,81 @@ const validationFn = {
         }
     }, //End of validateGetUserCounts
 
+    validateCreateComment: function(req, res, next) {
+        logger.info("validateCreateComment middleware called");
+        let errorMsg = "";
+        const userData = req.body.userData;
+        const commentData = req.body.commentData;
+        const type = req.params.type;
+        const objectId = req.params.id;
+
+        //Null or empty check
+        if (!objValidateEmptyOrNull(commentData) || !objValidateEmptyOrNull(userData)) {
+            errorMsg = "Missing replyData or userData";
+        } else if (!commentData.commentContent) {
+            errorMsg = "Missing data in replyData";
+        } else if (!userData.userId || !userData.firstName || !userData.email || !userData.roleId) {
+            errorMsg = "Missing data in userData";
+        } 
+        //Check for Ids 
+        else if (!validateUUID(userData.userId)) {
+            errorMsg = "Invalid userData";
+        } else if (!validateUUID(objectId)) {
+            errorMsg = "Invalid postId or replyId";
+        }
+        //Check for type
+        else if (type.toLowerCase() !== "question" && type.toLowerCase() !== "reply") {
+            errorMsg = "Invalid type";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateCreateComment Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateCreateComment
+
+    validateGetComments: function(req, res, next) {
+        logger.info("validateGetComments middleware called");
+        let errorMsg = "";
+        const type = req.params.type;
+        const objectId = req.params.id;
+        const { count, page } = req.query;
+
+        //Null or empty check
+        if (count == null || count === "" || page == null || page === "") {
+            errorMsg = "Missing count or page number";
+        }
+        //Check for valid count and page
+        else if (!validateInt(count) || !validateInt(page) || page < 1) {
+            errorMsg = "Invalid count or page num";
+        }
+        //Check for Ids 
+        else if (!validateUUID(objectId)) {
+            errorMsg = "Invalid postId or replyId";
+        }
+        //Check for type
+        else if (type.toLowerCase() !== "question" && type.toLowerCase() !== "reply") {
+            errorMsg = "Invalid type";
+        }
+
+        if (errorMsg === "") { //if no error message move on
+            next();
+        } else {
+            logger.error("", new ValidationError("validateGetComments Failed: " + errorMsg));
+            res.status(500).json({  
+                "success": false,
+                "data": null,
+                "message": errorMsg 
+            });
+        }
+    }, //End of validateGetComments
+
     //sanitization function
     sanitizeResult: function(req, res, next){
         logger.info("sanitizeResult middleware called");
