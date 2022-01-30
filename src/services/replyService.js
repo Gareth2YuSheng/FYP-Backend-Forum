@@ -216,7 +216,7 @@ exports.markForumReplyAsCorrectAnswer = (isAnswer, reply) => {
     });
 } //End of markForumReplyAsCorrectAnswer
 
-exports.deleteReply = (replyId) => {
+exports.deleteReply = (replyId, postId) => {
     logger.info("deleteReply running");
     //delete forum post reply instance provided
     return new Promise(async (res, rej) => {
@@ -225,6 +225,8 @@ exports.deleteReply = (replyId) => {
             const result = await models.PostReply.destroy({
                 where: { replyId: replyId }
             });     
+            //Decrease reply count for post
+            const countResult = await postService.incrementPostReplyCount(postId, -1); // need parent Id
             res("Reply Deleted Successfully.");
         } catch (error) {
             rej(new DatabaseError(error.message));

@@ -327,7 +327,7 @@ exports.deleteForumPostReply = async (req, res, next) => {
             });
         }
         //delete reply with replyId
-        const results = await replyService.deleteReply(replyId);
+        const results = await replyService.deleteReply(replyId, reply.parentId);
         if (results) {
             logger.info(`Successfully deleted reply: {replyId: ${reply.replyId}}`);
             return res.status(200).json({  
