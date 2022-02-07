@@ -22,10 +22,7 @@ const User = sequelize.define("User", {
             allowNull: true
         },
         profileImage: {
-            type: DataTypes.STRING(300),
-            validate: {
-                isUrl: true
-            }
+            type: DataTypes.STRING(300)
         },
         rating: {
             type: DataTypes.DECIMAL(10, 2),
