@@ -1,6 +1,5 @@
 const { DatabaseError } = require("../errors/errors");
 const { logger } = require("../logger/logger");
-//const cloudinaryService = require("./cloudinaryService");
 const sequelize = require("../config/database");
 const models = sequelize.models;
 
