@@ -18,7 +18,6 @@ exports.getForumQuestions = async (req, res, next) => {
                 "message": null 
             });
         }
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);
@@ -81,7 +80,6 @@ exports.getForumQuestionCountBySubject = async (req, res, next) => {
             general += count;
         } 
         results["General"] = general;
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         if (results) {
             logger.info(`Successfully retrieved subject counts`);
             return res.status(200).json({  
@@ -252,7 +250,6 @@ exports.deleteForumQuestion = async (req, res, next) => {
                 "message": "Question Deleted Successfully." 
             });
         }
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
     } catch (error) {
         if (!(error instanceof DatabaseError)) next(new ApplicationError(error.message));
         else next(error);

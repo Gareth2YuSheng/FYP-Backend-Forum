@@ -1,5 +1,4 @@
 //Import Controllers
-const testController = require("./controllers/testController"); //remove later
 const authController = require("./controllers/authController");
 const questionController = require("./controllers/questionController");
 const replyController = require("./controllers/replyController");
@@ -28,12 +27,6 @@ const urlPrefix = "/forum";
 
 //Match URL with controllers
 exports.appRoute = router => {
-    //Testing routes remove later
-    // router.get("/api/test", testController.testRouteFunc);
-    // router.get("/api/subject_grade", testController.subjectsGrade);
-    // router.post("/api/test", testController.testRouteFuncPost);
-    // router.put("/api/test", testController.testRouteFuncPut);
-    // router.delete("/api/test", testController.testRouteFuncDelete);
 
     //GET
     router.get(urlPrefix + "/question/:q_id/details?", verifyFn.verifyToken, validationFn.validateGetForumQuestion, questionController.getForumQuestionDetails);

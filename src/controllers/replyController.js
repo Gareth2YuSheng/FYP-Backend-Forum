@@ -47,7 +47,6 @@ exports.createForumReply = async (req, res, next) => {
         const user = await userService.getIfNotCreateUser(userData);
         //Make sure there is a post with the postId before creating the reply
         // const post = await postService.getPosts(postData);
-        //next(); //call sanitization middleware, only sanitize of there is output data that is strings
         //Create the Reply
         const results = await replyService.createReply(
             replyData.replyContent,
